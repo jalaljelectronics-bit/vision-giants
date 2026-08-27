@@ -13,8 +13,6 @@
   --color-error: 179 38 30;           /* #B3261E */
   --color-success: 40 167 69;         /* #28A745 */
   --color-pending: 251 177 91;        /* #FBB15B */
-  --chrome-from: #E8EAEE;
-  --chrome-to: #9AA3B2;
 }
 
 .dark {
@@ -28,8 +26,6 @@
   --color-error: 179 38 30;
   --color-success: 40 167 69;
   --color-pending: 251 177 91;
-  --chrome-from: #4A5568;
-  --chrome-to: #9AA3B2;
 }
 
 * {
@@ -55,17 +51,15 @@ h1, h2, h3, h4 {
   border-radius: 2px;
 }
 
-/* Signature chrome hairline divider */
+/* Hairline divider between sections */
 .chrome-rule {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--chrome-from), var(--chrome-to), var(--chrome-from), transparent);
-  opacity: 0.7;
+  background-color: rgb(var(--color-tertiary) / 0.4);
 }
 
-/* Signature chrome shimmer for primary CTAs */
+/* Primary CTA background */
 .chrome-shimmer {
-  background: linear-gradient(110deg, rgb(var(--color-primary)) 40%, var(--chrome-to) 50%, rgb(var(--color-primary)) 60%);
-  background-size: 200% 100%;
+  background-color: rgb(var(--color-primary));
 }
 
 @media (prefers-reduced-motion: reduce) {
