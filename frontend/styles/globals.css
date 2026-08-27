@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: 27 42 74;          /* #1B2A4A */
+  --color-background: 245 246 248;    /* #F5F6F8 */
+  --color-surface: 255 255 255;       /* #FFFFFF */
+  --color-primary-container: 221 228 242; /* #DDE4F2 */
+  --color-body: 69 75 87;             /* #454B57 */
+  --color-secondary: 66 82 122;       /* #42527A */
+  --color-tertiary: 199 204 214;      /* #C7CCD6 */
+  --color-error: 179 38 30;           /* #B3261E */
+  --color-success: 40 167 69;         /* #28A745 */
+  --color-pending: 251 177 91;        /* #FBB15B */
+  --chrome-from: #E8EAEE;
+  --chrome-to: #9AA3B2;
+}
+
+.dark {
+  --color-primary: 130 177 255;       /* #82B1FF */
+  --color-background: 18 23 42;       /* #12172A */
+  --color-surface: 27 35 56;          /* #1B2338 */
+  --color-primary-container: 42 53 87; /* #2A3557 */
+  --color-body: 216 219 227;          /* #D8DBE3 */
+  --color-secondary: 66 82 122;
+  --color-tertiary: 199 204 214;
+  --color-error: 179 38 30;
+  --color-success: 40 167 69;
+  --color-pending: 251 177 91;
+  --chrome-from: #4A5568;
+  --chrome-to: #9AA3B2;
+}
+
+* {
+  border-color: rgb(var(--color-tertiary) / 0.4);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background text-body font-body antialiased transition-colors duration-300;
+}
+
+h1, h2, h3, h4 {
+  @apply font-display text-primary;
+}
+
+/* Visible keyboard focus everywhere — accessibility floor */
+:focus-visible {
+  outline: 2px solid rgb(var(--color-primary));
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Signature chrome hairline divider */
+.chrome-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--chrome-from), var(--chrome-to), var(--chrome-from), transparent);
+  opacity: 0.7;
+}
+
+/* Signature chrome shimmer for primary CTAs */
+.chrome-shimmer {
+  background: linear-gradient(110deg, rgb(var(--color-primary)) 40%, var(--chrome-to) 50%, rgb(var(--color-primary)) 60%);
+  background-size: 200% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
