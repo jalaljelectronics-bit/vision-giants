@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   postgres:
@@ -16,7 +16,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 40s
 
   api:
     build: .
@@ -25,12 +26,12 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "5000:5000"
+      - "4000:4000"
     environment:
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-password123}@postgres:5432/vision_giants
       JWT_SECRET: ${JWT_SECRET}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      PORT: 5000
+      PORT: 4000
       NODE_ENV: production
     command: sh -c "node src/db/migrate.js && node src/server.js"
 
