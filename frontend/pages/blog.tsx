@@ -1,9 +1,12 @@
 import { GetStaticProps } from 'next';
 import { Seo } from '@/components/seo/Seo';
 import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
+import { HeroBand } from '@/components/layout/HeroBand';
 import { BlogCard } from '@/components/sections/BlogCard';
+import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
-import { siteConfig } from '@/lib/utils';
+import { siteConfig, cn } from '@/lib/utils';
+import { mockBlogPosts } from '@/lib/mockData';
 import type { BlogPost } from '@/types';
 
 interface Props {
@@ -25,23 +28,52 @@ export default function BlogPage({ posts }: Props) {
         ]}
       />
 
+      <HeroBand
+        eyebrow="Blog"
+        title="Notes from the studio"
+        crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog' }]}
+      />
+
       <section className="mx-auto max-w-container px-6 py-20">
-        <p className="font-mono text-xs uppercase tracking-widest text-body/50">Blog</p>
-        <h1 className="mt-2 max-w-2xl font-display text-4xl font-semibold text-primary md:text-5xl">
-          Notes from the studio
-        </h1>
-        <p className="mt-4 max-w-xl text-body/70">
-          Engineering, product, and process — what we're learning as we build.
-        </p>
+        <Reveal className="max-w-xl">
+          <p className="text-body/70">
+            Engineering, product, and process — what we're learning as we build.
+          </p>
+        </Reveal>
 
         {posts.length === 0 ? (
           <p className="mt-16 text-body/50">No posts published yet — check back soon.</p>
         ) : (
-          <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <BlogCard key={post.slug} post={post} />
-            ))}
-          </div>
+          <>
+            <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {posts.map((post) => (
+                <BlogCard key={post.slug} post={post} />
+              ))}
+            </div>
+
+            {/* Pagination — decorative until the archive grows past one page */}
+            <div className="mt-14 flex items-center justify-center gap-2">
+              <button
+                disabled
+                className="rounded-full border border-tertiary/40 px-4 py-2 font-mono text-xs uppercase tracking-widest text-body/40"
+              >
+                Prev
+              </button>
+              <span
+                className={cn(
+                  'chrome-shimmer flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white'
+                )}
+              >
+                1
+              </span>
+              <button
+                disabled
+                className="rounded-full border border-tertiary/40 px-4 py-2 font-mono text-xs uppercase tracking-widest text-body/40"
+              >
+                Next
+              </button>
+            </div>
+          </>
         )}
       </section>
     </>
@@ -56,6 +88,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
     return { props: { posts }, revalidate: 1800 };
   } catch {
-    return { props: { posts: [] }, revalidate: 60 };
+    return { props: { posts: mockBlogPosts }, revalidate: 60 };
   }
 };
