@@ -1,6 +1,7 @@
 ﻿import Image from 'next/image';
 import Link from 'next/link';
 import { siteConfig } from '@/lib/utils';
+import { RevealItem } from '@/components/motion/Reveal';
 import type { PortfolioItem } from '@/types';
 
 interface PortfolioCardProps {
@@ -9,41 +10,43 @@ interface PortfolioCardProps {
 
 export function PortfolioCard({ item }: PortfolioCardProps) {
   return (
-    <Link
-      href={`/portfolio/${item.slug}`}
-      className="group block overflow-hidden rounded-2xl border border-tertiary/40 bg-surface transition-shadow hover:shadow-lg hover:shadow-primary/5"
-    >
-      <div className="relative aspect-[16/10] overflow-hidden bg-primary-container">
-        <Image
-          src={item.images[0]}
-          alt={`${item.title} — project by ${siteConfig.name}`}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 50vw"
-        />
-        {item.featured && (
-          <span className="absolute left-4 top-4 rounded-full bg-surface/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-primary">
-            Featured
-          </span>
-        )}
-      </div>
-      <div className="p-6">
-        <p className="font-mono text-xs uppercase tracking-widest text-body/50">
-          {item.client_name}
-        </p>
-        <h2 className="mt-2 font-display text-xl font-semibold text-primary">{item.title}</h2>
-        <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.description}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {item.technologies.slice(0, 4).map((tech) => (
-            <span
-              key={tech}
-              className="rounded-full bg-primary-container px-3 py-1 font-mono text-[10px] uppercase tracking-wide text-primary"
-            >
-              {tech}
+    <RevealItem>
+      <Link
+        href={`/portfolio/${item.slug}`}
+        className="group block overflow-hidden rounded-2xl border border-tertiary/40 bg-surface transition-shadow duration-300 hover:shadow-xl hover:shadow-primary/10"
+      >
+        <div className="relative aspect-[16/10] overflow-hidden bg-primary-container">
+          <Image
+            src={item.images[0]}
+            alt={`${item.title} — project by ${siteConfig.name}`}
+            fill
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          {item.featured && (
+            <span className="absolute left-4 top-4 rounded-full bg-surface/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-primary">
+              Featured
             </span>
-          ))}
+          )}
         </div>
-      </div>
-    </Link>
+        <div className="p-6">
+          <p className="font-mono text-xs uppercase tracking-widest text-body/50">
+            {item.client_name}
+          </p>
+          <h2 className="mt-2 font-display text-xl font-semibold text-primary">{item.title}</h2>
+          <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.description}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {item.technologies.slice(0, 4).map((tech) => (
+              <span
+                key={tech}
+                className="rounded-full bg-primary-container px-3 py-1 font-mono text-[10px] uppercase tracking-wide text-primary"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      </Link>
+    </RevealItem>
   );
 }

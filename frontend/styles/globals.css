@@ -13,6 +13,12 @@
   --color-error: 179 38 30;           /* #B3261E */
   --color-success: 40 167 69;         /* #28A745 */
   --color-pending: 251 177 91;        /* #FBB15B */
+
+  /* Chrome sheen — the site's signature motion element. A cool
+     metallic gradient that sweeps across primary CTAs and rules. */
+  --chrome-from: #1B2A4A;
+  --chrome-via: #4A6FA5;
+  --chrome-to: #1B2A4A;
 }
 
 .dark {
@@ -26,6 +32,10 @@
   --color-error: 179 38 30;
   --color-success: 40 167 69;
   --color-pending: 251 177 91;
+
+  --chrome-from: #82B1FF;
+  --chrome-via: #C7DBFF;
+  --chrome-to: #82B1FF;
 }
 
 * {
@@ -57,9 +67,55 @@ h1, h2, h3, h4 {
   background-color: rgb(var(--color-tertiary) / 0.4);
 }
 
-/* Primary CTA background */
+/* Primary CTA background — animated metallic sweep, not a flat fill.
+   Falls back to a static color if the browser can't do background-position
+   animation cheaply, and is disabled entirely under reduced motion below. */
 .chrome-shimmer {
-  background-color: rgb(var(--color-primary));
+  background-color: var(--chrome-from);
+  background-image: linear-gradient(
+    110deg,
+    var(--chrome-from) 30%,
+    var(--chrome-via) 50%,
+    var(--chrome-from) 70%
+  );
+  background-size: 220% 100%;
+  animation: shimmer-sweep 5s ease-in-out infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% { background-position: 200% 0; }
+  50% { background-position: 0% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Sheen that sweeps across a card/button on hover — used by Card + Button */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgb(255 255 255 / 0.16) 50%,
+    transparent 60%
+  );
+  background-size: 250% 250%;
+  background-position: 200% 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.sheen:hover::after {
+  opacity: 1;
+  animation: sheen-sweep 1.1s ease forwards;
+}
+@keyframes sheen-sweep {
+  from { background-position: 200% 0; }
+  to { background-position: -50% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -68,5 +124,8 @@ h1, h2, h3, h4 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .chrome-shimmer {
+    background-image: none;
   }
 }

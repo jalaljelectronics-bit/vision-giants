@@ -3,7 +3,8 @@ import { ThemeProvider } from 'next-themes';
 import { Sora, Inter, JetBrains_Mono } from 'next/font/google';
 import Layout from '@/components/layout/Layout';
 import { OrganizationJsonLd } from '@/components/seo/JsonLd';
-import '@/styles/globals.css';
+import { PageTransition } from '@/components/motion/PageTransition';
+import '../styles/globals.css';
 
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora', display: 'swap' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -15,7 +16,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <div className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
         <OrganizationJsonLd />
         <Layout>
-          <Component {...pageProps} />
+          <PageTransition>
+            <Component {...pageProps} />
+          </PageTransition>
         </Layout>
       </div>
     </ThemeProvider>
