@@ -1,10 +1,10 @@
-
 // components/admin/BlogFormModal.tsx
 
 import { useState, FormEvent } from 'react';
 import type { BlogPost } from '@/types';
 import { adminApi } from '@/lib/api';
 import RichTextEditor from './RichTextEditor';
+import CloudinaryUpload from './CloudinaryUpload';
 
 interface BlogFormModalProps {
   post: BlogPost | null;
@@ -165,23 +165,17 @@ export default function BlogFormModal({
           required
         />
 
-        <label htmlFor="cover_image">
-          Cover Image URL{' '}
-          <span className="admin-field-hint">
-            (Cloudinary widget planned)
-          </span>
-        </label>
+        <label>Cover Image</label>
 
-        <input
-          id="cover_image"
+        <CloudinaryUpload
           value={form.cover_image}
-          onChange={(e) =>
+          onChange={(url) =>
             updateField(
               'cover_image',
-              e.target.value
+              typeof url === 'string' ? url : ''
             )
           }
-          placeholder="https://res.cloudinary.com/..."
+          label={form.cover_image ? 'Replace Image' : 'Upload Image'}
         />
 
         <label htmlFor="content">
@@ -198,46 +192,50 @@ export default function BlogFormModal({
         <fieldset className="admin-fieldset">
           <legend>SEO</legend>
 
-          <label htmlFor="meta_title">
-            Meta Title
-          </label>
+          <div className="admin-field-group">
+            <label htmlFor="meta_title">
+              Meta Title
+            </label>
 
-          <input
-            id="meta_title"
-            value={form.meta_title}
-            onChange={(e) =>
-              updateField(
-                'meta_title',
-                e.target.value
-              )
-            }
-            maxLength={60}
-          />
+            <input
+              id="meta_title"
+              value={form.meta_title}
+              onChange={(e) =>
+                updateField(
+                  'meta_title',
+                  e.target.value
+                )
+              }
+              maxLength={60}
+            />
 
-          <span className="admin-field-hint">
-            {form.meta_title.length}/60
-          </span>
+            <span className="admin-field-hint">
+              {form.meta_title.length}/60
+            </span>
+          </div>
 
-          <label htmlFor="meta_description">
-            Meta Description
-          </label>
+          <div className="admin-field-group">
+            <label htmlFor="meta_description">
+              Meta Description
+            </label>
 
-          <textarea
-            id="meta_description"
-            value={form.meta_description}
-            onChange={(e) =>
-              updateField(
-                'meta_description',
-                e.target.value
-              )
-            }
-            rows={2}
-            maxLength={160}
-          />
+            <textarea
+              id="meta_description"
+              value={form.meta_description}
+              onChange={(e) =>
+                updateField(
+                  'meta_description',
+                  e.target.value
+                )
+              }
+              rows={3}
+              maxLength={160}
+            />
 
-          <span className="admin-field-hint">
-            {form.meta_description.length}/160
-          </span>
+            <span className="admin-field-hint">
+              {form.meta_description.length}/160
+            </span>
+          </div>
         </fieldset>
 
         {error && (
@@ -286,4 +284,3 @@ export default function BlogFormModal({
     </div>
   );
 }
-
