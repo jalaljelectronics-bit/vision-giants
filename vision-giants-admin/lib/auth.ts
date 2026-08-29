@@ -8,6 +8,11 @@ import { adminApi } from './api';
 export async function getCurrentAdmin(): Promise<Admin | null> {
   try {
     const res = await adminApi.get<{ admin: Admin }>('/auth/me');
+
+    if (!res.success || !res.data) {
+      return null;
+    }
+
     return res.data.admin;
   } catch {
     return null;
