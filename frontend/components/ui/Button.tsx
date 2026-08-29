@@ -23,9 +23,9 @@ interface ButtonAsLink extends BaseProps {
 type Props = ButtonAsButton | ButtonAsLink;
 
 const variantStyles: Record<Variant, string> = {
-  primary: 'chrome-shimmer text-white shadow-sm hover:opacity-90',
+  primary: 'chrome-shimmer sheen text-white shadow-sm hover:shadow-md hover:shadow-primary/20',
   secondary:
-    'bg-primary-container text-primary hover:bg-primary-container/70 border border-tertiary/40',
+    'sheen bg-primary-container text-primary hover:bg-primary-container/70 border border-tertiary/40',
   ghost: 'text-primary hover:bg-primary-container/50',
 };
 
@@ -35,8 +35,13 @@ const sizeStyles: Record<Size, string> = {
   lg: 'px-8 py-4 text-base',
 };
 
+// Pure CSS lift + press -- a spring-y hover rise and a satisfying compress
+// on click, without pulling framer-motion into the ref/typing chain here.
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full font-mono uppercase tracking-widest transition-all focus-visible:outline-2';
+  'inline-flex items-center justify-center gap-2 rounded-full font-mono uppercase tracking-widest ' +
+  'transition-[transform,box-shadow] duration-200 ease-out ' +
+  'hover:-translate-y-0.5 hover:scale-[1.015] active:scale-95 active:translate-y-0 ' +
+  'focus-visible:outline-2';
 
 export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
   const { variant = 'primary', size = 'md', className } = props;
