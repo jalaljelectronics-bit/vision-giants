@@ -79,11 +79,16 @@ export default function CareersPage({ jobs }: Props) {
   );
 }
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
     const jobs = await api.getJobs();
-    return { props: { jobs }, revalidate: 3600 };
+
+    return {
+      props: { jobs },
+    };
   } catch {
-    return { props: { jobs: [] }, revalidate: 60 };
+    return {
+      props: { jobs: [] },
+    };
   }
 };

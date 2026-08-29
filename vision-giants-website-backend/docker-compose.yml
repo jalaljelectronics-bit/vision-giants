@@ -30,7 +30,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-password123}@postgres:5432/vision_giants
       JWT_SECRET: ${JWT_SECRET}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3001}
+      ADMIN_URL: ${ADMIN_URL:-http://localhost:3000}
       PORT: 4000
       NODE_ENV: production
     command: sh -c "node src/db/migrate.js && node src/server.js"

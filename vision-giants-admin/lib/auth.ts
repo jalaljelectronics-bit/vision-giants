@@ -1,4 +1,3 @@
-// lib/auth.ts
 import type { Admin } from '@/types';
 import { adminApi } from './api';
 
@@ -8,19 +7,27 @@ import { adminApi } from './api';
  */
 export async function getCurrentAdmin(): Promise<Admin | null> {
   try {
-    const res = await adminApi.get<Admin>('/auth/me');
-    return res.data;
+    const res = await adminApi.get<{ admin: Admin }>('/auth/me');
+    return res.data.admin;
   } catch {
     return null;
   }
 }
 
-export async function loginAdmin(email: string, password: string): Promise<Admin> {
-  const res = await adminApi.post<Admin>('/auth/login', { email, password });
+export async function loginAdmin(
+  email: string,
+  password: string
+): Promise<Admin> {
+  const res = await adminApi.post<{ admin: Admin }>('/auth/login', {
+    email,
+    password,
+  });
+
   if (!res.success || !res.data) {
     throw new Error(res.error ?? 'Login failed');
   }
-  return res.data;
+
+  return res.data.admin;
 }
 
 export async function logoutAdmin(): Promise<void> {

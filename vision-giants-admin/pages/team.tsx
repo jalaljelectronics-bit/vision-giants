@@ -1,4 +1,6 @@
+
 // pages/team.tsx
+
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { TeamMember } from '@/types';
@@ -10,21 +12,33 @@ import TeamFormModal from '@/components/admin/TeamFormModal';
 export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [editingMember, setEditingMember] =
+    useState<TeamMember | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
+  const [deletingMember, setDeletingMember] =
+    useState<TeamMember | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadMembers();
   }, []);
 
-  function loadMembers() {
+  async function loadMembers() {
     setIsLoading(true);
-    adminApi
-      .get<TeamMember[]>('/admin/team')
-      .then((res) => setMembers(res.data ?? []))
-      .finally(() => setIsLoading(false));
+
+    try {
+      const res =
+        await adminApi.get<TeamMember[]>('/team');
+
+      setMembers(res.data ?? []);
+    } catch (error) {
+      console.error(
+        'Failed to load team members:',
+        error
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleAddNew() {
@@ -39,31 +53,65 @@ export default function TeamPage() {
 
   async function handleDeleteConfirmed() {
     if (!deletingMember) return;
+
     setIsDeleting(true);
+
     try {
-      await adminApi.delete(`/admin/team/${deletingMember.id}`);
-      setMembers((prev) => prev.filter((m) => m.id !== deletingMember.id));
+      await adminApi.delete(
+        `/team/${deletingMember.id}`
+      );
+
+      setMembers((prev) =>
+        prev.filter(
+          (member) =>
+            member.id !== deletingMember.id
+        )
+      );
+
       setDeletingMember(null);
+    } catch (error) {
+      console.error(
+        'Failed to delete team member:',
+        error
+      );
     } finally {
       setIsDeleting(false);
     }
   }
 
   const columns: Column<TeamMember>[] = [
-    { key: 'order', header: 'Order' },
-    { key: 'name', header: 'Name' },
-    { key: 'role', header: 'Role' },
+    {
+      key: 'order',
+      header: 'Order',
+    },
+    {
+      key: 'name',
+      header: 'Name',
+    },
+    {
+      key: 'role',
+      header: 'Role',
+    },
   ];
 
   return (
     <>
       <Head>
-        <title>Team — Vision Giants Admin</title>
+        <title>
+          Team — Vision Giants Admin
+        </title>
       </Head>
 
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Team</h1>
-        <button type="button" onClick={handleAddNew} className="admin-button-primary">
+        <h1 className="admin-page-title">
+          Team
+        </h1>
+
+        <button
+          type="button"
+          onClick={handleAddNew}
+          className="admin-button-primary"
+        >
           + Add Team Member
         </button>
       </div>
@@ -83,10 +131,19 @@ export default function TeamPage() {
           onClose={() => setIsFormOpen(false)}
           onSaved={(saved) => {
             setIsFormOpen(false);
+
             setMembers((prev) => {
-              const exists = prev.some((m) => m.id === saved.id);
+              const exists = prev.some(
+                (member) =>
+                  member.id === saved.id
+              );
+
               return exists
-                ? prev.map((m) => (m.id === saved.id ? saved : m))
+                ? prev.map((member) =>
+                    member.id === saved.id
+                      ? saved
+                      : member
+                  )
                 : [...prev, saved];
             });
           }}
@@ -96,11 +153,17 @@ export default function TeamPage() {
       <ConfirmDialog
         isOpen={Boolean(deletingMember)}
         title="Remove team member?"
-        message={`This will permanently remove "${deletingMember?.name}" from the team.`}
+        message={`This will permanently remove "${
+          deletingMember?.name ??
+          'this team member'
+        }" from the team.`}
         onConfirm={handleDeleteConfirmed}
-        onCancel={() => setDeletingMember(null)}
+        onCancel={() =>
+          setDeletingMember(null)
+        }
         isConfirming={isDeleting}
       />
     </>
   );
 }
+

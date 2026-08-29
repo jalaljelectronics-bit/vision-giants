@@ -8,8 +8,9 @@ const { pool } = require('./db');
 const app = express();
 
 app.use(helmet());
+const cookieParser = require('cookie-parser');
 
-const allowedOrigins = [process.env.FRONTEND_URL].filter(Boolean);
+const allowedOrigins = [process.env.FRONTEND_URL,process.env.ADMIN_URL].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -22,7 +23,7 @@ app.use(cors({
   },
   credentials: true,
 }));
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -43,7 +44,9 @@ app.use('/api/team', require('./routes/team'));
 app.use('/api/testimonials', require('./routes/testimonials'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/applications', require('./routes/applications'));
+
 app.use('/api/leads', require('./routes/leads'));
+app.use('/api/admin', require('./routes/admin'));
 
 app.use(errorHandler);
 

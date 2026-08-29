@@ -532,3 +532,22 @@ a {
   margin-top: 12px;
   text-align: center;
 }
+.admin-cloudinary-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.admin-cloudinary-preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-cloudinary-preview-image {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+}

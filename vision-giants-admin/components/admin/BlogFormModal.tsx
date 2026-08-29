@@ -1,4 +1,6 @@
+
 // components/admin/BlogFormModal.tsx
+
 import { useState, FormEvent } from 'react';
 import type { BlogPost } from '@/types';
 import { adminApi } from '@/lib/api';
@@ -32,6 +34,7 @@ function toFormState(post: BlogPost | null): BlogFormState {
       published: false,
     };
   }
+
   return {
     title: post.title,
     slug: post.slug,
@@ -51,29 +54,46 @@ function slugify(text: string): string {
     .replace(/\s+/g, '-');
 }
 
-export default function BlogFormModal({ post, onClose, onSaved }: BlogFormModalProps) {
-  const [form, setForm] = useState<BlogFormState>(toFormState(post));
+export default function BlogFormModal({
+  post,
+  onClose,
+  onSaved,
+}: BlogFormModalProps) {
+  const [form, setForm] = useState<BlogFormState>(
+    toFormState(post)
+  );
+
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const isEditing = Boolean(post);
 
-  function updateField<K extends keyof BlogFormState>(key: K, value: BlogFormState[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  function updateField<K extends keyof BlogFormState>(
+    key: K,
+    value: BlogFormState[K]
+  ) {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   }
 
   function handleTitleChange(value: string) {
     updateField('title', value);
+
     if (!isEditing) {
       updateField('slug', slugify(value));
-      // Default meta_title to the post title unless the user has already
-      // typed something different into the SEO field.
+
       if (!form.meta_title) {
         updateField('meta_title', value);
       }
     }
   }
 
-  async function handleSubmit(e: FormEvent, publishNow?: boolean) {
+  async function handleSubmit(
+    e: FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+    publishNow?: boolean
+  ) {
     e.preventDefault();
     setError(null);
     setIsSaving(true);
@@ -85,106 +105,185 @@ export default function BlogFormModal({ post, onClose, onSaved }: BlogFormModalP
 
     try {
       const res = isEditing
-        ? await adminApi.put<BlogPost>(`/admin/blog/${post!.id}`, payload)
-        : await adminApi.post<BlogPost>('/admin/blog', payload);
+        ? await adminApi.put<BlogPost>(
+            `/blog/${post!.id}`,
+            payload
+          )
+        : await adminApi.post<BlogPost>(
+            '/blog',
+            payload
+          );
 
-      if (!res.data) throw new Error('No data returned');
+      if (!res.data) {
+        throw new Error('No data returned');
+      }
+
       onSaved(res.data);
-    } catch {
-      setError('Could not save post. Check the fields and try again.');
+    } catch (err) {
+      console.error('Failed to save blog post:', err);
+      setError(
+        'Could not save post. Check the fields and try again.'
+      );
     } finally {
       setIsSaving(false);
     }
   }
 
   return (
-    <div className="admin-modal-overlay" onClick={onClose}>
+    <div
+      className="admin-modal-overlay"
+      onClick={onClose}
+    >
       <form
         className="admin-modal admin-modal-form admin-modal-form-large"
         onClick={(e) => e.stopPropagation()}
         onSubmit={(e) => handleSubmit(e)}
       >
-        <h2>{isEditing ? 'Edit Post' : 'New Post'}</h2>
+        <h2>
+          {isEditing ? 'Edit Post' : 'New Post'}
+        </h2>
 
         <label htmlFor="title">Title</label>
+
         <input
           id="title"
           value={form.title}
-          onChange={(e) => handleTitleChange(e.target.value)}
+          onChange={(e) =>
+            handleTitleChange(e.target.value)
+          }
           required
         />
 
         <label htmlFor="slug">Slug</label>
+
         <input
           id="slug"
           value={form.slug}
-          onChange={(e) => updateField('slug', e.target.value)}
+          onChange={(e) =>
+            updateField('slug', e.target.value)
+          }
           required
         />
 
         <label htmlFor="cover_image">
-          Cover Image URL <span className="admin-field-hint">(Cloudinary widget planned)</span>
+          Cover Image URL{' '}
+          <span className="admin-field-hint">
+            (Cloudinary widget planned)
+          </span>
         </label>
+
         <input
           id="cover_image"
           value={form.cover_image}
-          onChange={(e) => updateField('cover_image', e.target.value)}
+          onChange={(e) =>
+            updateField(
+              'cover_image',
+              e.target.value
+            )
+          }
           placeholder="https://res.cloudinary.com/..."
         />
 
-        <label htmlFor="content">Content</label>
+        <label htmlFor="content">
+          Content
+        </label>
+
         <RichTextEditor
           value={form.content}
-          onChange={(value) => updateField('content', value)}
+          onChange={(value) =>
+            updateField('content', value)
+          }
         />
 
         <fieldset className="admin-fieldset">
           <legend>SEO</legend>
 
-          <label htmlFor="meta_title">Meta Title</label>
+          <label htmlFor="meta_title">
+            Meta Title
+          </label>
+
           <input
             id="meta_title"
             value={form.meta_title}
-            onChange={(e) => updateField('meta_title', e.target.value)}
+            onChange={(e) =>
+              updateField(
+                'meta_title',
+                e.target.value
+              )
+            }
             maxLength={60}
           />
-          <span className="admin-field-hint">{form.meta_title.length}/60</span>
 
-          <label htmlFor="meta_description">Meta Description</label>
+          <span className="admin-field-hint">
+            {form.meta_title.length}/60
+          </span>
+
+          <label htmlFor="meta_description">
+            Meta Description
+          </label>
+
           <textarea
             id="meta_description"
             value={form.meta_description}
-            onChange={(e) => updateField('meta_description', e.target.value)}
+            onChange={(e) =>
+              updateField(
+                'meta_description',
+                e.target.value
+              )
+            }
             rows={2}
             maxLength={160}
           />
-          <span className="admin-field-hint">{form.meta_description.length}/160</span>
+
+          <span className="admin-field-hint">
+            {form.meta_description.length}/160
+          </span>
         </fieldset>
 
-        {error && <p className="admin-error-text">{error}</p>}
+        {error && (
+          <p className="admin-error-text">
+            {error}
+          </p>
+        )}
 
         <div className="admin-modal-actions">
-          <button type="button" onClick={onClose} className="admin-button-secondary">
+          <button
+            type="button"
+            onClick={onClose}
+            className="admin-button-secondary"
+            disabled={isSaving}
+          >
             Cancel
           </button>
+
           <button
             type="button"
             disabled={isSaving}
             className="admin-button-secondary"
-            onClick={(e) => handleSubmit(e as any, false)}
+            onClick={(e) =>
+              handleSubmit(e, false)
+            }
           >
-            Save Draft
+            {isSaving
+              ? 'Saving…'
+              : 'Save Draft'}
           </button>
+
           <button
             type="button"
             disabled={isSaving}
             className="admin-button-primary"
-            onClick={(e) => handleSubmit(e as any, true)}
+            onClick={(e) =>
+              handleSubmit(e, true)
+            }
           >
-            {isSaving ? 'Publishing…' : 'Publish'}
+            {isSaving
+              ? 'Publishing…'
+              : 'Publish'}
           </button>
         </div>
       </form>
     </div>
   );
 }
+

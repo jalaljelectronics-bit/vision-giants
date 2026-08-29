@@ -1,4 +1,6 @@
+
 // pages/blog.tsx
+
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { BlogPost } from '@/types';
@@ -19,12 +21,17 @@ export default function BlogPage() {
     loadPosts();
   }, []);
 
-  function loadPosts() {
+  async function loadPosts() {
     setIsLoading(true);
-    adminApi
-      .get<BlogPost[]>('/admin/blog')
-      .then((res) => setPosts(res.data ?? []))
-      .finally(() => setIsLoading(false));
+
+    try {
+      const res = await adminApi.get<BlogPost[]>('/blog/admin/all');
+      setPosts(res.data ?? []);
+    } catch (error) {
+      console.error('Failed to load blog posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleAddNew() {
@@ -39,31 +46,51 @@ export default function BlogPage() {
 
   async function handleDeleteConfirmed() {
     if (!deletingPost) return;
+
     setIsDeleting(true);
+
     try {
-      await adminApi.delete(`/admin/blog/${deletingPost.id}`);
-      setPosts((prev) => prev.filter((p) => p.id !== deletingPost.id));
+      await adminApi.delete(`/blog/${deletingPost.id}`);
+
+      setPosts((prev) =>
+        prev.filter((post) => post.id !== deletingPost.id)
+      );
+
       setDeletingPost(null);
+    } catch (error) {
+      console.error('Failed to delete blog post:', error);
     } finally {
       setIsDeleting(false);
     }
   }
 
   const columns: Column<BlogPost>[] = [
-    { key: 'title', header: 'Title' },
+    {
+      key: 'title',
+      header: 'Title',
+    },
     {
       key: 'published',
       header: 'Status',
-      render: (p) => (
-        <span className={p.published ? 'admin-badge-success' : 'admin-badge-pending'}>
-          {p.published ? 'Published' : 'Draft'}
+      render: (post) => (
+        <span
+          className={
+            post.published
+              ? 'admin-badge-success'
+              : 'admin-badge-pending'
+          }
+        >
+          {post.published ? 'Published' : 'Draft'}
         </span>
       ),
     },
     {
       key: 'published_at',
       header: 'Published At',
-      render: (p) => (p.published_at ? new Date(p.published_at).toLocaleDateString() : '—'),
+      render: (post) =>
+        post.published_at
+          ? new Date(post.published_at).toLocaleDateString()
+          : '—',
     },
   ];
 
@@ -75,7 +102,12 @@ export default function BlogPage() {
 
       <div className="admin-page-header">
         <h1 className="admin-page-title">Blog</h1>
-        <button type="button" onClick={handleAddNew} className="admin-button-primary">
+
+        <button
+          type="button"
+          onClick={handleAddNew}
+          className="admin-button-primary"
+        >
           + New Post
         </button>
       </div>
@@ -95,9 +127,17 @@ export default function BlogPage() {
           onClose={() => setIsFormOpen(false)}
           onSaved={(saved) => {
             setIsFormOpen(false);
+
             setPosts((prev) => {
-              const exists = prev.some((p) => p.id === saved.id);
-              return exists ? prev.map((p) => (p.id === saved.id ? saved : p)) : [...prev, saved];
+              const exists = prev.some(
+                (post) => post.id === saved.id
+              );
+
+              return exists
+                ? prev.map((post) =>
+                    post.id === saved.id ? saved : post
+                  )
+                : [...prev, saved];
             });
           }}
         />
@@ -106,7 +146,9 @@ export default function BlogPage() {
       <ConfirmDialog
         isOpen={Boolean(deletingPost)}
         title="Delete post?"
-        message={`This will permanently remove "${deletingPost?.title}".`}
+        message={`This will permanently remove "${
+          deletingPost?.title ?? 'this post'
+        }".`}
         onConfirm={handleDeleteConfirmed}
         onCancel={() => setDeletingPost(null)}
         isConfirming={isDeleting}
@@ -114,3 +156,4 @@ export default function BlogPage() {
     </>
   );
 }
+

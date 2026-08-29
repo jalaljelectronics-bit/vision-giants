@@ -1,4 +1,6 @@
+
 // pages/jobs.tsx
+
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -20,12 +22,17 @@ export default function JobsPage() {
     loadJobs();
   }, []);
 
-  function loadJobs() {
+  async function loadJobs() {
     setIsLoading(true);
-    adminApi
-      .get<JobPosting[]>('/admin/jobs')
-      .then((res) => setJobs(res.data ?? []))
-      .finally(() => setIsLoading(false));
+
+    try {
+      const res = await adminApi.get<JobPosting[]>('/jobs/admin/all');
+      setJobs(res.data ?? []);
+    } catch (error) {
+      console.error('Failed to load jobs:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleAddNew() {
@@ -40,35 +47,64 @@ export default function JobsPage() {
 
   async function handleDeleteConfirmed() {
     if (!deletingJob) return;
+
     setIsDeleting(true);
+
     try {
-      await adminApi.delete(`/admin/jobs/${deletingJob.id}`);
-      setJobs((prev) => prev.filter((j) => j.id !== deletingJob.id));
+      await adminApi.delete(`/jobs/${deletingJob.id}`);
+
+      setJobs((prev) =>
+        prev.filter((job) => job.id !== deletingJob.id)
+      );
+
       setDeletingJob(null);
+    } catch (error) {
+      console.error('Failed to delete job:', error);
     } finally {
       setIsDeleting(false);
     }
   }
 
   const columns: Column<JobPosting>[] = [
-    { key: 'title', header: 'Title' },
-    { key: 'department', header: 'Department' },
-    { key: 'location', header: 'Location' },
-    { key: 'type', header: 'Type' },
+    {
+      key: 'title',
+      header: 'Title',
+    },
+    {
+      key: 'department',
+      header: 'Department',
+    },
+    {
+      key: 'location',
+      header: 'Location',
+    },
+    {
+      key: 'type',
+      header: 'Type',
+    },
     {
       key: 'is_active',
       header: 'Status',
-      render: (j) => (
-        <span className={j.is_active ? 'admin-badge-success' : 'admin-badge-pending'}>
-          {j.is_active ? 'Active' : 'Closed'}
+      render: (job) => (
+        <span
+          className={
+            job.is_active
+              ? 'admin-badge-success'
+              : 'admin-badge-pending'
+          }
+        >
+          {job.is_active ? 'Active' : 'Closed'}
         </span>
       ),
     },
     {
       key: 'applications',
       header: 'Applications',
-      render: (j) => (
-        <Link href={`/applications?job=${j.id}`} className="admin-table-link">
+      render: (job) => (
+        <Link
+          href={`/applications?job=${job.id}`}
+          className="admin-table-link"
+        >
           View
         </Link>
       ),
@@ -82,8 +118,15 @@ export default function JobsPage() {
       </Head>
 
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Job Postings</h1>
-        <button type="button" onClick={handleAddNew} className="admin-button-primary">
+        <h1 className="admin-page-title">
+          Job Postings
+        </h1>
+
+        <button
+          type="button"
+          onClick={handleAddNew}
+          className="admin-button-primary"
+        >
           + New Job Posting
         </button>
       </div>
@@ -103,9 +146,17 @@ export default function JobsPage() {
           onClose={() => setIsFormOpen(false)}
           onSaved={(saved) => {
             setIsFormOpen(false);
+
             setJobs((prev) => {
-              const exists = prev.some((j) => j.id === saved.id);
-              return exists ? prev.map((j) => (j.id === saved.id ? saved : j)) : [...prev, saved];
+              const exists = prev.some(
+                (job) => job.id === saved.id
+              );
+
+              return exists
+                ? prev.map((job) =>
+                    job.id === saved.id ? saved : job
+                  )
+                : [...prev, saved];
             });
           }}
         />
@@ -114,7 +165,9 @@ export default function JobsPage() {
       <ConfirmDialog
         isOpen={Boolean(deletingJob)}
         title="Delete job posting?"
-        message={`This will permanently remove "${deletingJob?.title}". Existing applications for this job will remain in the Applications tab.`}
+        message={`This will permanently remove "${
+          deletingJob?.title ?? 'this job'
+        }". Existing applications for this job will remain in the Applications tab.`}
         onConfirm={handleDeleteConfirmed}
         onCancel={() => setDeletingJob(null)}
         isConfirming={isDeleting}
@@ -122,3 +175,4 @@ export default function JobsPage() {
     </>
   );
 }
+

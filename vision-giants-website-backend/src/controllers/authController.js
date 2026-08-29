@@ -4,6 +4,13 @@ const { compare } = require('../utils/hashPassword');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -20,5 +27,23 @@ exports.login = asyncHandler(async (req, res) => {
     { expiresIn: '7d' }
   );
 
-  ApiResponse.success(res, { token, admin: { id: admin.id, email: admin.email, name: admin.name } });
+  res.cookie('admin_token', token, COOKIE_OPTIONS);
+
+  ApiResponse.success(res, {
+    admin: { id: admin.id, email: admin.email, name: admin.name },
+  });
+});
+
+exports.logout = asyncHandler(async (req, res) => {
+  res.clearCookie('admin_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+  ApiResponse.success(res, { message: 'Logged out' });
+});
+
+exports.me = asyncHandler(async (req, res) => {
+  // req.admin is set by the auth middleware after verifying the cookie
+  ApiResponse.success(res, { admin: req.admin });
 });

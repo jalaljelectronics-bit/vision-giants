@@ -1,4 +1,6 @@
+
 // pages/testimonials.tsx
+
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { Testimonial } from '@/types';
@@ -10,21 +12,33 @@ import TestimonialFormModal from '@/components/admin/TestimonialFormModal';
 export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
+  const [editingTestimonial, setEditingTestimonial] =
+    useState<Testimonial | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [deletingTestimonial, setDeletingTestimonial] = useState<Testimonial | null>(null);
+  const [deletingTestimonial, setDeletingTestimonial] =
+    useState<Testimonial | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadTestimonials();
   }, []);
 
-  function loadTestimonials() {
+  async function loadTestimonials() {
     setIsLoading(true);
-    adminApi
-      .get<Testimonial[]>('/admin/testimonials')
-      .then((res) => setTestimonials(res.data ?? []))
-      .finally(() => setIsLoading(false));
+
+    try {
+      const res =
+        await adminApi.get<Testimonial[]>('/testimonials');
+
+      setTestimonials(res.data ?? []);
+    } catch (error) {
+      console.error(
+        'Failed to load testimonials:',
+        error
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleAddNew() {
@@ -39,36 +53,76 @@ export default function TestimonialsPage() {
 
   async function handleDeleteConfirmed() {
     if (!deletingTestimonial) return;
+
     setIsDeleting(true);
+
     try {
-      await adminApi.delete(`/admin/testimonials/${deletingTestimonial.id}`);
-      setTestimonials((prev) => prev.filter((t) => t.id !== deletingTestimonial.id));
+      await adminApi.delete(
+        `/testimonials/${deletingTestimonial.id}`
+      );
+
+      setTestimonials((prev) =>
+        prev.filter(
+          (testimonial) =>
+            testimonial.id !==
+            deletingTestimonial.id
+        )
+      );
+
       setDeletingTestimonial(null);
+    } catch (error) {
+      console.error(
+        'Failed to delete testimonial:',
+        error
+      );
     } finally {
       setIsDeleting(false);
     }
   }
 
   const columns: Column<Testimonial>[] = [
-    { key: 'client_name', header: 'Client' },
-    { key: 'client_company', header: 'Company' },
+    {
+      key: 'client_name',
+      header: 'Client',
+    },
+    {
+      key: 'client_company',
+      header: 'Company',
+    },
     {
       key: 'content',
       header: 'Quote',
-      render: (t) => (t.content.length > 60 ? `${t.content.slice(0, 60)}…` : t.content),
+      render: (testimonial) =>
+        testimonial.content.length > 60
+          ? `${testimonial.content.slice(0, 60)}…`
+          : testimonial.content,
     },
-    { key: 'rating', header: 'Rating', render: (t) => '★'.repeat(t.rating) },
+    {
+      key: 'rating',
+      header: 'Rating',
+      render: (testimonial) =>
+        '★'.repeat(testimonial.rating),
+    },
   ];
 
   return (
     <>
       <Head>
-        <title>Testimonials — Vision Giants Admin</title>
+        <title>
+          Testimonials — Vision Giants Admin
+        </title>
       </Head>
 
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Testimonials</h1>
-        <button type="button" onClick={handleAddNew} className="admin-button-primary">
+        <h1 className="admin-page-title">
+          Testimonials
+        </h1>
+
+        <button
+          type="button"
+          onClick={handleAddNew}
+          className="admin-button-primary"
+        >
           + Add Testimonial
         </button>
       </div>
@@ -88,10 +142,19 @@ export default function TestimonialsPage() {
           onClose={() => setIsFormOpen(false)}
           onSaved={(saved) => {
             setIsFormOpen(false);
+
             setTestimonials((prev) => {
-              const exists = prev.some((t) => t.id === saved.id);
+              const exists = prev.some(
+                (testimonial) =>
+                  testimonial.id === saved.id
+              );
+
               return exists
-                ? prev.map((t) => (t.id === saved.id ? saved : t))
+                ? prev.map((testimonial) =>
+                    testimonial.id === saved.id
+                      ? saved
+                      : testimonial
+                  )
                 : [...prev, saved];
             });
           }}
@@ -101,9 +164,14 @@ export default function TestimonialsPage() {
       <ConfirmDialog
         isOpen={Boolean(deletingTestimonial)}
         title="Delete testimonial?"
-        message={`This will permanently remove the testimonial from "${deletingTestimonial?.client_name}".`}
+        message={`This will permanently remove the testimonial from "${
+          deletingTestimonial?.client_name ??
+          'this client'
+        }".`}
         onConfirm={handleDeleteConfirmed}
-        onCancel={() => setDeletingTestimonial(null)}
+        onCancel={() =>
+          setDeletingTestimonial(null)
+        }
         isConfirming={isDeleting}
       />
     </>
