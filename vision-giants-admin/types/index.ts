@@ -13,6 +13,7 @@ export interface Service {
   short_description: string;
   description: string;
   image: string;
+  sub_services: { title: string; description: string }[];
   order: number;
   created_at: string;
 }
