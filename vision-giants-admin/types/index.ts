@@ -67,8 +67,10 @@ export interface JobPosting {
   department: string;
   location: string;
   type: string; // e.g. "Full-time", "Contract"
+  experience_level: string; // e.g. "Mid", "Senior"
   description: string;
-  requirements: string;
+  requirements: string[];
+  responsibilities: string[];
   is_active: boolean;
   created_at: string;
 }

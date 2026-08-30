@@ -587,3 +587,98 @@ a {
   align-items: center;
   margin-bottom: 8px;
 }
+
+/* ---------- Two-column form rows (e.g. Job Posting form) ---------- */
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.admin-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-form-field label {
+  margin-top: 0;
+}
+
+.admin-form-field input,
+.admin-form-field select {
+  margin-top: 4px;
+}
+
+.admin-required {
+  color: var(--color-error);
+  margin-left: 2px;
+}
+
+/* ---------- Tag input (Requirements / Responsibilities) ---------- */
+
+.admin-tag-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-tag-input-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-tertiary-accent);
+  background: var(--color-background);
+}
+
+.admin-tag-input-field input {
+  flex: 1;
+  min-width: 140px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-body-text);
+}
+
+.admin-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 10px;
+  border-radius: 999px;
+  background: var(--color-primary-container);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.admin-tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+/* ---------- Job description textarea ---------- */
+
+.admin-description-textarea {
+  padding: 16px 18px !important;
+  min-height: 220px;
+}
+
+.admin-description-textarea:focus {
+  outline: none;
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.25);
+}
