@@ -1,6 +1,7 @@
 const blog = require('../queries/blog');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
+const { revalidatePaths } = require('../utils/revalidate');
 
 // Public — only published posts
 exports.listPublic = asyncHandler(async (req, res) => {
@@ -22,7 +23,11 @@ exports.getOne = asyncHandler(async (req, res) => {
 
 exports.create = asyncHandler(async (req, res) => {
   const { rows } = await blog.create(req.body);
-  ApiResponse.success(res, rows[0], 201);
+  const post = rows[0];
+
+  revalidatePaths(['/blog', `/blog/${post.slug}`]);
+
+  ApiResponse.success(res, post, 201);
 });
 
 exports.update = asyncHandler(async (req, res) => {
@@ -31,10 +36,18 @@ exports.update = asyncHandler(async (req, res) => {
   const wasPublished = current[0]?.published || false;
   const { rows } = await blog.update(req.params.id, req.body, wasPublished);
   if (!rows.length) return ApiResponse.error(res, 'Post not found', 404);
-  ApiResponse.success(res, rows[0]);
+
+  const post = rows[0];
+
+  revalidatePaths(['/blog', `/blog/${post.slug}`]);
+
+  ApiResponse.success(res, post);
 });
 
 exports.remove = asyncHandler(async (req, res) => {
   await blog.remove(req.params.id);
+
+  revalidatePaths(['/blog']);
+
   ApiResponse.success(res, { deleted: true });
 });
