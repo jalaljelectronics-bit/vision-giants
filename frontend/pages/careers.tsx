@@ -5,7 +5,6 @@ import { HeroBand } from '@/components/layout/HeroBand';
 import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
-import { mockJobs } from '@/lib/mockData';
 import type { JobPosting } from '@/types';
 import { ArrowRight, MapPin, Briefcase } from 'lucide-react';
 import Link from 'next/link';
@@ -92,6 +91,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     const jobs = await api.getJobs();
     return { props: { jobs }, revalidate: 3600 };
   } catch {
-    return { props: { jobs: mockJobs }, revalidate: 60 };
+    return { props: { jobs: [] }, revalidate: 60 };
   }
 };

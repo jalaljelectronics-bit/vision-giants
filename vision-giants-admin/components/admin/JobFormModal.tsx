@@ -1,9 +1,9 @@
-
 // components/admin/JobFormModal.tsx
 
 import { useState, FormEvent } from 'react';
 import type { JobPosting } from '@/types';
 import { adminApi } from '@/lib/api';
+import TagInputField from './TagInputField';
 
 interface JobFormModalProps {
   job: JobPosting | null;
@@ -11,15 +11,19 @@ interface JobFormModalProps {
   onSaved: (job: JobPosting) => void;
 }
 
+type JobStatus = 'Open' | 'Closed';
+
 interface JobFormState {
   title: string;
   slug: string;
   department: string;
   location: string;
   type: string;
+  experience_level: string;
+  status: JobStatus;
   description: string;
-  requirements: string;
-  is_active: boolean;
+  requirements: string[];
+  responsibilities: string[];
 }
 
 const JOB_TYPES = [
@@ -29,6 +33,8 @@ const JOB_TYPES = [
   'Internship',
 ];
 
+const STATUS_OPTIONS: JobStatus[] = ['Open', 'Closed'];
+
 function toFormState(job: JobPosting | null): JobFormState {
   if (!job) {
     return {
@@ -37,9 +43,11 @@ function toFormState(job: JobPosting | null): JobFormState {
       department: '',
       location: '',
       type: JOB_TYPES[0],
+      experience_level: '',
+      status: 'Open',
       description: '',
-      requirements: '',
-      is_active: true,
+      requirements: [],
+      responsibilities: [],
     };
   }
 
@@ -49,9 +57,11 @@ function toFormState(job: JobPosting | null): JobFormState {
     department: job.department ?? '',
     location: job.location ?? '',
     type: job.type ?? JOB_TYPES[0],
+    experience_level: job.experience_level ?? '',
+    status: job.is_active ? 'Open' : 'Closed',
     description: job.description ?? '',
-    requirements: job.requirements ?? '',
-    is_active: job.is_active ?? true,
+    requirements: job.requirements ?? [],
+    responsibilities: job.responsibilities ?? [],
   };
 }
 
@@ -96,9 +106,7 @@ export default function JobFormModal({
     }
   }
 
-  async function handleSubmit(
-    e: FormEvent<HTMLFormElement>
-  ) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (isSaving) return;
@@ -107,15 +115,17 @@ export default function JobFormModal({
     setIsSaving(true);
 
     try {
-      const payload: JobFormState = {
+      const payload = {
         title: form.title.trim(),
         slug: form.slug.trim(),
         department: form.department.trim(),
         location: form.location.trim(),
         type: form.type,
+        experience_level: form.experience_level.trim(),
         description: form.description.trim(),
-        requirements: form.requirements.trim(),
-        is_active: form.is_active,
+        requirements: form.requirements,
+        responsibilities: form.responsibilities,
+        is_active: form.status === 'Open',
       };
 
       if (
@@ -123,8 +133,10 @@ export default function JobFormModal({
         !payload.slug ||
         !payload.department ||
         !payload.location ||
+        !payload.experience_level ||
         !payload.description ||
-        !payload.requirements
+        payload.requirements.length === 0 ||
+        payload.responsibilities.length === 0
       ) {
         throw new Error(
           'Please complete all required fields.'
@@ -175,140 +187,154 @@ export default function JobFormModal({
             : 'New Job Posting'}
         </h2>
 
-        <label htmlFor="title">
-          Title
-        </label>
+        <div className="admin-form-row">
+          <div className="admin-form-field">
+            <label htmlFor="title">
+              Job title <span className="admin-required">*</span>
+            </label>
 
-        <input
-          id="title"
-          type="text"
-          value={form.title}
-          onChange={(e) =>
-            handleTitleChange(e.target.value)
-          }
-          required
-        />
+            <input
+              id="title"
+              type="text"
+              value={form.title}
+              onChange={(e) =>
+                handleTitleChange(e.target.value)
+              }
+              required
+            />
+          </div>
 
-        <label htmlFor="slug">
-          Slug
-        </label>
+          <div className="admin-form-field">
+            <label htmlFor="department">
+              Department <span className="admin-required">*</span>
+            </label>
 
-        <input
-          id="slug"
-          type="text"
-          value={form.slug}
-          onChange={(e) =>
-            updateField('slug', e.target.value)
-          }
-          required
-        />
+            <input
+              id="department"
+              type="text"
+              value={form.department}
+              onChange={(e) =>
+                updateField('department', e.target.value)
+              }
+              required
+            />
+          </div>
+        </div>
 
-        <label htmlFor="department">
-          Department
-        </label>
+        <div className="admin-form-row">
+          <div className="admin-form-field">
+            <label htmlFor="location">
+              Location <span className="admin-required">*</span>
+            </label>
 
-        <input
-          id="department"
-          type="text"
-          value={form.department}
-          onChange={(e) =>
-            updateField(
-              'department',
-              e.target.value
-            )
-          }
-          placeholder="e.g. Engineering"
-          required
-        />
+            <input
+              id="location"
+              type="text"
+              value={form.location}
+              onChange={(e) =>
+                updateField('location', e.target.value)
+              }
+              placeholder="e.g. Remote, Lahore, PK"
+              required
+            />
+          </div>
 
-        <label htmlFor="location">
-          Location
-        </label>
+          <div className="admin-form-field">
+            <label htmlFor="type">
+              Employment type
+            </label>
 
-        <input
-          id="location"
-          type="text"
-          value={form.location}
-          onChange={(e) =>
-            updateField(
-              'location',
-              e.target.value
-            )
-          }
-          placeholder="e.g. Remote, Karachi"
-          required
-        />
-
-        <label htmlFor="type">
-          Type
-        </label>
-
-        <select
-          id="type"
-          value={form.type}
-          onChange={(e) =>
-            updateField('type', e.target.value)
-          }
-        >
-          {JOB_TYPES.map((type) => (
-            <option
-              key={type}
-              value={type}
+            <select
+              id="type"
+              value={form.type}
+              onChange={(e) =>
+                updateField('type', e.target.value)
+              }
             >
-              {type}
-            </option>
-          ))}
-        </select>
+              {JOB_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="admin-form-row">
+          <div className="admin-form-field">
+            <label htmlFor="experience_level">
+              Experience level <span className="admin-required">*</span>
+            </label>
+
+            <input
+              id="experience_level"
+              type="text"
+              value={form.experience_level}
+              onChange={(e) =>
+                updateField('experience_level', e.target.value)
+              }
+              placeholder="e.g. Mid, Senior"
+              required
+            />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="status">
+              Status
+            </label>
+
+            <select
+              id="status"
+              value={form.status}
+              onChange={(e) =>
+                updateField('status', e.target.value as JobStatus)
+              }
+            >
+              {STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <label htmlFor="description">
-          Description
+          Job description <span className="admin-required">*</span>
         </label>
 
         <textarea
           id="description"
+          className="admin-description-textarea"
           value={form.description}
           onChange={(e) =>
-            updateField(
-              'description',
-              e.target.value
-            )
+            updateField('description', e.target.value)
           }
-          rows={5}
+          rows={6}
           required
         />
 
         <label htmlFor="requirements">
-          Requirements
+          Requirements <span className="admin-required">*</span>
         </label>
 
-        <textarea
+        <TagInputField
           id="requirements"
-          value={form.requirements}
-          onChange={(e) =>
-            updateField(
-              'requirements',
-              e.target.value
-            )
-          }
-          rows={5}
-          placeholder="One requirement per line"
-          required
+          values={form.requirements}
+          onChange={(values) => updateField('requirements', values)}
+          placeholder="e.g. 3+ years with React"
         />
 
-        <label className="admin-checkbox-label">
-          <input
-            type="checkbox"
-            checked={form.is_active}
-            onChange={(e) =>
-              updateField(
-                'is_active',
-                e.target.checked
-              )
-            }
-          />
-
-          Active (visible on public careers page)
+        <label htmlFor="responsibilities">
+          Responsibilities <span className="admin-required">*</span>
         </label>
+
+        <TagInputField
+          id="responsibilities"
+          values={form.responsibilities}
+          onChange={(values) => updateField('responsibilities', values)}
+          placeholder="e.g. Own the frontend architecture"
+        />
 
         {error && (
           <p className="admin-error-text">
@@ -334,12 +360,11 @@ export default function JobFormModal({
             {isSaving
               ? 'Saving…'
               : isEditing
-                ? 'Save Changes'
-                : 'Create'}
+                ? '💾 Save Changes'
+                : '💾 Post job'}
           </button>
         </div>
       </form>
     </div>
   );
 }
-
