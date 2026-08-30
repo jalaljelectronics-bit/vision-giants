@@ -110,7 +110,13 @@ export default function PortfolioPage({ items, testimonials }: Props) {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
-    const [items, testimonials] = await Promise.all([api.getPortfolio(), api.getTestimonials()]);
+    const [allItems, testimonials] = await Promise.all([
+      api.getPortfolio(),
+      api.getTestimonials(),
+    ]);
+
+    const items = allItems.filter((item) => !item.is_draft);
+
     return { props: { items, testimonials }, revalidate: 3600 };
   } catch {
     return { props: { items: [], testimonials: [] }, revalidate: 60 };

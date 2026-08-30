@@ -17,9 +17,9 @@ export default function PortfolioDetailPage({ item }: Props) {
     <>
       <Seo
         title={item.title}
-        description={item.description.slice(0, 155)}
+        description={item.challenge.slice(0, 155)}
         path={`/portfolio/${item.slug}`}
-        image={item.images[0]}
+        image={item.cover_image}
         type="article"
       />
       <BreadcrumbJsonLd
@@ -37,7 +37,6 @@ export default function PortfolioDetailPage({ item }: Props) {
         <h1 className="mt-2 font-display text-4xl font-semibold text-primary md:text-5xl">
           {item.title}
         </h1>
-        <p className="mt-6 max-w-2xl text-lg text-body/80">{item.description}</p>
 
         <div className="mt-6 flex flex-wrap gap-2">
           {item.technologies.map((tech) => (
@@ -50,21 +49,32 @@ export default function PortfolioDetailPage({ item }: Props) {
           ))}
         </div>
 
+        <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-2xl bg-primary-container">
+          <Image
+            src={item.cover_image}
+            alt={item.title}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        </div>
+
         <div className="chrome-rule my-10" />
 
-        <div className="space-y-6">
-          {item.images.map((img, i) => (
-            <div key={img} className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-primary-container">
-              <Image
-                src={img}
-                alt={`${item.title} — screenshot ${i + 1}`}
-                fill
-                className="object-cover"
-                sizes="100vw"
-                priority={i === 0}
-              />
-            </div>
-          ))}
+        <div className="grid gap-10 md:grid-cols-3">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-primary">Challenge</h2>
+            <p className="mt-3 text-sm text-body/70">{item.challenge}</p>
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-semibold text-primary">Solution</h2>
+            <p className="mt-3 text-sm text-body/70">{item.solution}</p>
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-semibold text-primary">Result</h2>
+            <p className="mt-3 text-sm text-body/70">{item.result}</p>
+          </div>
         </div>
 
         <div className="mt-14 rounded-2xl border border-tertiary/40 bg-primary-container/30 p-8 text-center">
@@ -84,7 +94,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   try {
     const items = await api.getPortfolio();
     return {
-      paths: items.map((i) => ({ params: { slug: i.slug } })),
+      paths: items.filter((i) => !i.is_draft).map((i) => ({ params: { slug: i.slug } })),
       fallback: 'blocking',
     };
   } catch {
@@ -95,6 +105,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   try {
     const item = await api.getPortfolioItem(params!.slug as string);
+
+    if (item.is_draft) {
+      return { notFound: true };
+    }
+
     return { props: { item }, revalidate: 3600 };
   } catch {
     return { notFound: true };

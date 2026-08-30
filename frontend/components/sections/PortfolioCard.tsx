@@ -17,24 +17,31 @@ export function PortfolioCard({ item }: PortfolioCardProps) {
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-primary-container">
           <Image
-            src={item.images[0]}
+            src={item.cover_image}
             alt={`${item.title} — project by ${siteConfig.name}`}
             fill
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
-          {item.featured && (
-            <span className="absolute left-4 top-4 rounded-full bg-surface/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-primary">
-              Featured
-            </span>
-          )}
+          <div className="absolute left-4 top-4 flex gap-2">
+            {item.featured && (
+              <span className="rounded-full bg-surface/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-primary">
+                Featured
+              </span>
+            )}
+            {item.is_new_arrival && (
+              <span className="rounded-full bg-primary/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white">
+                New
+              </span>
+            )}
+          </div>
         </div>
         <div className="p-6">
           <p className="font-mono text-xs uppercase tracking-widest text-body/50">
             {item.client_name}
           </p>
           <h2 className="mt-2 font-display text-xl font-semibold text-primary">{item.title}</h2>
-          <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.description}</p>
+          <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.challenge}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {item.technologies.slice(0, 4).map((tech) => (
               <span

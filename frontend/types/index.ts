@@ -15,10 +15,15 @@ export interface PortfolioItem {
   title: string;
   slug: string;
   client_name: string;
-  description: string;
-  images: string[];
+  related_service_id: number | null;
+  cover_image: string;
+  challenge: string;
+  solution: string;
+  result: string;
   technologies: string[];
   featured: boolean;
+  is_new_arrival: boolean;
+  is_draft: boolean;
   created_at: string;
 }
 
