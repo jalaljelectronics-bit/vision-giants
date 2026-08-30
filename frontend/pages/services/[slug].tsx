@@ -5,7 +5,7 @@ import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { Service } from '@/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   service: Service;
@@ -41,6 +41,38 @@ export default function ServiceDetailPage({ service }: Props) {
           className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-primary"
           dangerouslySetInnerHTML={{ __html: service.description }}
         />
+
+        {service.sub_services && service.sub_services.length > 0 && (
+          <section className="mt-16">
+            <h2 className="font-display text-2xl font-semibold text-primary">
+              What's included
+            </h2>
+
+            <div className="mt-8 grid gap-6 sm:grid-cols-2">
+              {service.sub_services.map((sub, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-tertiary/40 bg-surface p-6"
+                >
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2
+                      size={20}
+                      className="mt-0.5 shrink-0 text-primary"
+                    />
+                    <div>
+                      <h3 className="font-display text-base font-semibold text-primary">
+                        {sub.title}
+                      </h3>
+                      <p className="mt-2 text-sm text-body/70">
+                        {sub.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div className="mt-14 rounded-2xl border border-tertiary/40 bg-primary-container/30 p-8 text-center">
           <h2 className="font-display text-2xl font-semibold text-primary">
