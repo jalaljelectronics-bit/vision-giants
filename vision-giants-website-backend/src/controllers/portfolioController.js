@@ -2,6 +2,7 @@ const portfolio = require('../queries/portfolio');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const { revalidatePaths } = require('../utils/revalidate');
+const { query } = require('../db');
 
 exports.list = asyncHandler(async (req, res) => {
   const { rows } = await portfolio.getAll();
@@ -35,9 +36,13 @@ exports.update = asyncHandler(async (req, res) => {
 });
 
 exports.remove = asyncHandler(async (req, res) => {
+  const { rows } = await query('SELECT slug FROM portfolio WHERE id = $1', [req.params.id]);
+  const slug = rows[0]?.slug;
+
   await portfolio.remove(req.params.id);
 
-  revalidatePaths(['/portfolio']);
+  const paths = slug ? ['/portfolio', `/portfolio/${slug}`] : ['/portfolio'];
+  revalidatePaths(paths);
 
   ApiResponse.success(res, { deleted: true });
 });
