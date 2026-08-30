@@ -7,7 +7,6 @@ import { HeroBand } from '@/components/layout/HeroBand';
 import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
-import { mockTeam } from '@/lib/mockData';
 import type { TeamMember } from '@/types';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
@@ -138,6 +137,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     const team = await api.getTeam();
     return { props: { team }, revalidate: 3600 };
   } catch {
-    return { props: { team: mockTeam }, revalidate: 60 };
+    return { props: { team: [] }, revalidate: 60 };
   }
 };

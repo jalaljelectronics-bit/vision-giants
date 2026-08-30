@@ -1,12 +1,18 @@
+import { GetStaticProps } from 'next';
 import { Seo } from '@/components/seo/Seo';
 import { Hero } from '@/components/sections/Hero';
 import { Testimonials } from '@/components/sections/Testimonials';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Reveal, RevealItem } from '@/components/motion/Reveal';
+import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
-import { mockTestimonials } from '@/lib/mockData';
+import type { Testimonial } from '@/types';
 import { Target, Eye, Heart, ArrowRight } from 'lucide-react';
+
+interface Props {
+  testimonials: Testimonial[];
+}
 
 const VALUES = [
   {
@@ -26,7 +32,7 @@ const VALUES = [
   },
 ];
 
-export default function HomePage() {
+export default function HomePage({ testimonials }: Props) {
   return (
     <>
       <Seo
@@ -74,7 +80,7 @@ export default function HomePage() {
               </h2>
             </div>
           </Reveal>
-          <Testimonials testimonials={mockTestimonials} />
+          <Testimonials testimonials={testimonials} />
         </div>
       </section>
 
@@ -94,3 +100,12 @@ export default function HomePage() {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  try {
+    const testimonials = await api.getTestimonials();
+    return { props: { testimonials }, revalidate: 3600 };
+  } catch {
+    return { props: { testimonials: [] }, revalidate: 60 };
+  }
+};

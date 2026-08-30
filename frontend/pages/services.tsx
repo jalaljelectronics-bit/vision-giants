@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/Button';
 import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
-import { mockServices } from '@/lib/mockData';
 import type { Service } from '@/types';
 import { ArrowRight } from 'lucide-react';
 
@@ -91,6 +90,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     const services = await api.getServices();
     return { props: { services }, revalidate: 3600 };
   } catch {
-    return { props: { services: mockServices }, revalidate: 60 };
+    return { props: { services: [] }, revalidate: 60 };
   }
 };

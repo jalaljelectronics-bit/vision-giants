@@ -9,15 +9,15 @@ import { Button } from '@/components/ui/Button';
 import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig, cn } from '@/lib/utils';
-import { mockPortfolio, mockTestimonials } from '@/lib/mockData';
-import type { PortfolioItem } from '@/types';
+import type { PortfolioItem, Testimonial } from '@/types';
 import { ArrowRight } from 'lucide-react';
 
 interface Props {
   items: PortfolioItem[];
+  testimonials: Testimonial[];
 }
 
-export default function PortfolioPage({ items }: Props) {
+export default function PortfolioPage({ items, testimonials }: Props) {
   const allTech = useMemo(
     () => Array.from(new Set(items.flatMap((i) => i.technologies))).sort(),
     [items]
@@ -90,7 +90,7 @@ export default function PortfolioPage({ items }: Props) {
               What clients say after launch
             </h2>
           </Reveal>
-          <Testimonials testimonials={mockTestimonials} />
+          <Testimonials testimonials={testimonials} />
         </div>
       </section>
 
@@ -110,9 +110,9 @@ export default function PortfolioPage({ items }: Props) {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
-    const items = await api.getPortfolio();
-    return { props: { items }, revalidate: 3600 };
+    const [items, testimonials] = await Promise.all([api.getPortfolio(), api.getTestimonials()]);
+    return { props: { items, testimonials }, revalidate: 3600 };
   } catch {
-    return { props: { items: mockPortfolio }, revalidate: 60 };
+    return { props: { items: [], testimonials: [] }, revalidate: 60 };
   }
 };

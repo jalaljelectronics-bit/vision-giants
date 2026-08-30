@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn, siteConfig } from '@/lib/utils';
 import { EASE_PREMIUM } from '@/lib/motion';
-import { mockServices } from '@/lib/mockData';
+import { api } from '@/lib/api';
+import type { Service } from '@/types';
 
 const NAV_LINKS = [
   { label: 'Portfolio', href: '/portfolio' },
@@ -22,7 +23,25 @@ const linkBase =
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
   const router = useRouter();
+
+  // Header renders on every page and has no getStaticProps of its own,
+  // so the dropdown's service list is fetched client-side once on mount.
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getServices()
+      .then((data) => {
+        if (!cancelled) setServices(data);
+      })
+      .catch(() => {
+        // Leave the dropdown's service list empty if the API isn't reachable
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const isServicesActive = router.pathname.startsWith('/services');
 
@@ -57,15 +76,19 @@ export default function Header() {
                   className="absolute left-0 top-full w-64 pt-2"
                 >
                   <div className="overflow-hidden rounded-2xl border border-tertiary/40 bg-surface p-2 shadow-xl shadow-primary/10">
-                    {mockServices.map((s) => (
-                      <Link
-                        key={s.slug}
-                        href={`/services/${s.slug}`}
-                        className="block rounded-xl px-3 py-2.5 text-sm text-secondary transition-colors hover:bg-primary-container/50 hover:text-primary"
-                      >
-                        {s.title}
-                      </Link>
-                    ))}
+                    {services.length === 0 ? (
+                      <p className="px-3 py-2.5 text-sm text-secondary/60">Loading services…</p>
+                    ) : (
+                      services.map((s) => (
+                        <Link
+                          key={s.slug}
+                          href={`/services/${s.slug}`}
+                          className="block rounded-xl px-3 py-2.5 text-sm text-secondary transition-colors hover:bg-primary-container/50 hover:text-primary"
+                        >
+                          {s.title}
+                        </Link>
+                      ))
+                    )}
                   </div>
                 </motion.div>
               )}

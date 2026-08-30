@@ -6,7 +6,6 @@ import { BlogCard } from '@/components/sections/BlogCard';
 import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig, cn } from '@/lib/utils';
-import { mockBlogPosts } from '@/lib/mockData';
 import type { BlogPost } from '@/types';
 
 interface Props {
@@ -88,6 +87,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
     return { props: { posts }, revalidate: 1800 };
   } catch {
-    return { props: { posts: mockBlogPosts }, revalidate: 60 };
+    return { props: { posts: [] }, revalidate: 60 };
   }
 };
