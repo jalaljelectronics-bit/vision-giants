@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY . .
 EXPOSE 5000
-CMD ["node", "src/server.js"]
+CMD  ["sh", "-c", "node src/db/migrate.js && node src/server.js"]
