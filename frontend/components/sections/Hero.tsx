@@ -1,8 +1,9 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-import { RevealItem } from '@/components/motion/Reveal';
 import { ArrowRight, CheckCircle2, Play } from 'lucide-react';
-import { fadeUp, staggerContainer } from '@/lib/motion';
+import { fadeUp, staggerContainer, EASE_PREMIUM } from '@/lib/motion';
+import type { Service } from '@/types';
 
 const CHECKLIST = [
   'Senior engineers on every project',
@@ -11,32 +12,49 @@ const CHECKLIST = [
   'Code you fully own, day one',
 ];
 
-const PREVIEW_CARDS = [
+// The three preview-card tones cycle by position (1st/2nd/3rd card),
+// not by which service happens to be showing — so the row always reads
+// as "dark / mid / light" regardless of which real services rotate through.
+const CARD_TONES = [
+  { box: 'chrome-shimmer', heading: 'text-white', body: 'text-white/80', meta: 'text-white/70' },
+  { box: 'bg-secondary', heading: 'text-white', body: 'text-white/80', meta: 'text-white/70' },
   {
-    title: 'Custom Software',
-    blurb: 'Internal tools built around your workflow.',
-    href: '/services/custom-software',
-    tone: 'chrome-shimmer text-white',
-    heading: 'text-white',
-  },
-  {
-    title: 'Web Development',
-    blurb: 'Fast, SEO-first web apps and platforms.',
-    href: '/services/web-development',
-    tone: 'bg-secondary text-white',
-    heading: 'text-white',
-  },
-  {
-    title: 'Mobile Apps',
-    blurb: 'Native-feel apps from one codebase.',
-    href: '/services/mobile-apps',
-    tone: 'bg-primary-container text-primary border border-tertiary/40',
+    box: 'bg-primary-container border border-tertiary/40',
     heading: 'text-primary',
+    body: 'text-body/70',
+    meta: 'text-primary/70',
   },
 ];
 
-export function Hero() {
+const ROTATE_MS = 3000;
+
+interface HeroProps {
+  services: Service[];
+}
+
+export function Hero({ services }: HeroProps) {
   const reduceMotion = useReducedMotion();
+
+  // Split the real services into groups of 3, and cycle through the groups.
+  const groups = useMemo(() => {
+    const chunks: Service[][] = [];
+    for (let i = 0; i < services.length; i += 3) {
+      chunks.push(services.slice(i, i + 3));
+    }
+    return chunks;
+  }, [services]);
+
+  const [groupIndex, setGroupIndex] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion || groups.length <= 1) return;
+    const id = setInterval(() => {
+      setGroupIndex((i) => (i + 1) % groups.length);
+    }, ROTATE_MS);
+    return () => clearInterval(id);
+  }, [groups.length, reduceMotion]);
+
+  const currentGroup = groups[groupIndex] ?? [];
 
   return (
     <section className="relative isolate overflow-hidden pb-28 md:pb-36">
@@ -141,31 +159,57 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Service preview cards straddling the fold */}
-        <div className="relative z-10 mt-16 grid gap-4 sm:grid-cols-3 md:mt-20">
-          {PREVIEW_CARDS.map((card) => (
-            <RevealItem key={card.title}>
-              <a
-                href={card.href}
-                className={`sheen block rounded-2xl p-6 shadow-xl shadow-primary/20 transition-transform duration-300 hover:-translate-y-1 ${card.tone}`}
+        {/* Real services, rotating 3-at-a-time */}
+        {currentGroup.length > 0 && (
+          <div className="relative z-10 mt-16 md:mt-20">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={groupIndex}
+                initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
+                animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
+                transition={{ duration: 0.5, ease: EASE_PREMIUM }}
+                className="grid gap-4 sm:grid-cols-3"
               >
-                <h3
-                  className={
-                    card.heading === 'text-white'
-                      ? 'font-display text-lg font-semibold !text-white'
-                      : 'font-display text-lg font-semibold !text-primary'
-                  }
-                >
-                  {card.title}
-                </h3>
-                <p className="mt-2 text-sm opacity-80">{card.blurb}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest opacity-70">
-                  Learn more <ArrowRight size={12} />
-                </span>
-              </a>
-            </RevealItem>
-          ))}
-        </div>
+                {currentGroup.map((service, i) => {
+                  const tone = CARD_TONES[i % CARD_TONES.length];
+                  return (
+                    <a
+                      key={service.slug}
+                      href={`/services/${service.slug}`}
+                      className={`sheen block rounded-2xl p-6 shadow-xl shadow-primary/20 transition-transform duration-300 hover:-translate-y-1 ${tone.box}`}
+                    >
+                      <h3 className={`font-display text-lg font-semibold ${tone.heading}`}>
+                        {service.title}
+                      </h3>
+                      <p className={`mt-2 text-sm ${tone.body}`}>{service.short_description}</p>
+                      <span
+                        className={`mt-4 inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest ${tone.meta}`}
+                      >
+                        Learn more <ArrowRight size={12} />
+                      </span>
+                    </a>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
+
+            {groups.length > 1 && (
+              <div className="mt-6 flex justify-center gap-2">
+                {groups.map((_, i) => (
+                  <button
+                    key={i}
+                    aria-label={`Show services group ${i + 1}`}
+                    onClick={() => setGroupIndex(i)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === groupIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/30'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
     </section>
   );
