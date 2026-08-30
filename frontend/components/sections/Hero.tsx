@@ -17,18 +17,21 @@ const PREVIEW_CARDS = [
     blurb: 'Internal tools built around your workflow.',
     href: '/services/custom-software',
     tone: 'chrome-shimmer text-white',
+    heading: 'text-white',
   },
   {
     title: 'Web Development',
     blurb: 'Fast, SEO-first web apps and platforms.',
     href: '/services/web-development',
     tone: 'bg-secondary text-white',
+    heading: 'text-white',
   },
   {
     title: 'Mobile Apps',
     blurb: 'Native-feel apps from one codebase.',
     href: '/services/mobile-apps',
     tone: 'bg-primary-container text-primary border border-tertiary/40',
+    heading: 'text-primary',
   },
 ];
 
@@ -146,7 +149,15 @@ export function Hero() {
                 href={card.href}
                 className={`sheen block rounded-2xl p-6 shadow-xl shadow-primary/20 transition-transform duration-300 hover:-translate-y-1 ${card.tone}`}
               >
-                <h3 className="font-display text-lg font-semibold">{card.title}</h3>
+                <h3
+                  className={
+                    card.heading === 'text-white'
+                      ? 'font-display text-lg font-semibold !text-white'
+                      : 'font-display text-lg font-semibold !text-primary'
+                  }
+                >
+                  {card.title}
+                </h3>
                 <p className="mt-2 text-sm opacity-80">{card.blurb}</p>
                 <span className="mt-4 inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest opacity-70">
                   Learn more <ArrowRight size={12} />
