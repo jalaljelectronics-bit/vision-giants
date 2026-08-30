@@ -15,6 +15,9 @@ interface Props {
   team: TeamMember[];
 }
 
+const CEO_PHOTO =
+  'https://res.cloudinary.com/r2fk1fws/image/upload/v1785584354/nexbyte/images/ykbp1vvu5jxcaiszhr76.png';
+
 const VALUES = [
   {
     title: 'Ship, then refine',
@@ -31,6 +34,11 @@ const VALUES = [
 ];
 
 export default function AboutPage({ team }: Props) {
+  // Pulls the real name/role from whoever's marked CEO/Founder on the team
+  // API, if anyone is; otherwise falls back to a placeholder you can edit.
+  const ceoFromApi = team.find((m) => /ceo|founder/i.test(m.role));
+  const ceo = ceoFromApi ?? { name: 'Jalal Khan', role: 'CEO', photo: CEO_PHOTO, id: 0, order: 0 };
+
   return (
     <>
       <Seo
@@ -79,6 +87,35 @@ export default function AboutPage({ team }: Props) {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-container px-6 py-20">
+        <Reveal className="grid items-center gap-12 md:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-primary-container">
+            <Image
+              src={CEO_PHOTO}
+              alt={ceo.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+          <div>
+            <h2 className="font-display text-3xl font-semibold text-primary md:text-4xl">
+              A message from our CEO
+            </h2>
+            {/* Swap this quote for the real one whenever you have it —
+                there's no "quote" field on TeamMember yet, so it's static
+                copy here rather than pulled from the API. */}
+            <p className="mt-6 text-lg text-body/80">
+              "Great software isn't the one with the most features — it's the one that quietly
+              gets out of your way and does its job. That's what we build for every client,
+              every time."
+            </p>
+            <p className="mt-6 font-display font-semibold text-primary">{ceo.name}</p>
+            <p className="text-sm text-body/60">{ceo.role}</p>
+          </div>
+        </Reveal>
       </section>
 
       {team.length > 0 && (
