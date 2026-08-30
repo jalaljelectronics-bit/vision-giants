@@ -39,7 +39,9 @@ export default function BlogPostPage({ post }: Props) {
         url={url}
       />
 
-      <article className="mx-auto max-w-3xl px-6 py-20">
+      {/* pt-32/md:pt-40 clears the fixed floating header, which no longer
+          reserves its own space in normal document flow. */}
+      <article className="mx-auto max-w-3xl px-6 pb-20 pt-32 md:pt-40">
         <p className="font-mono text-xs uppercase tracking-widest text-body/50">
           {formatDate(post.published_at)} · {readingTime(post.content)} min read
         </p>

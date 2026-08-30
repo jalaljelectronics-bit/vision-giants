@@ -84,7 +84,7 @@ export function Hero({ services }: HeroProps) {
       </div>
 
       <motion.div
-        className="relative z-10 mx-auto max-w-container px-6 pt-16 md:pt-20"
+        className="relative z-10 mx-auto max-w-container px-6 pt-32 md:pt-40"
         initial="hidden"
         animate="show"
         variants={staggerContainer(0.1, 0.05)}

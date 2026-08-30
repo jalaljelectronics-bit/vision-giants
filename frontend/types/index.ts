@@ -1,3 +1,8 @@
+export interface SubService {
+  title: string;
+  description: string;
+}
+
 export interface Service {
   id: number;
   title: string;
@@ -5,7 +10,7 @@ export interface Service {
   short_description: string;
   description: string;
   image: string;
-  sub_services: { title: string; description: string }[];
+  sub_services: SubService[];
   order: number;
   created_at: string;
 }

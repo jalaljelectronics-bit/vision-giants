@@ -32,7 +32,7 @@ export function HeroBand({ eyebrow, title, crumbs }: HeroBandProps) {
         initial="hidden"
         animate="show"
         variants={fadeUp}
-        className="relative z-10 mx-auto max-w-container px-6 py-16 md:py-20"
+        className="relative z-10 mx-auto max-w-container px-6 pb-16 pt-32 md:pb-20 md:pt-40"
       >
         <p className="font-mono text-xs uppercase tracking-widest text-white/50">{eyebrow}</p>
         <h1 className="mt-3 font-display text-4xl font-semibold text-white md:text-5xl">

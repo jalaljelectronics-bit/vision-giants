@@ -30,7 +30,7 @@ export function PortfolioCard({ item }: PortfolioCardProps) {
               </span>
             )}
             {item.is_new_arrival && (
-              <span className="rounded-full bg-primary/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white">
+              <span className="chrome-shimmer rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white">
                 New
               </span>
             )}
@@ -41,7 +41,9 @@ export function PortfolioCard({ item }: PortfolioCardProps) {
             {item.client_name}
           </p>
           <h2 className="mt-2 font-display text-xl font-semibold text-primary">{item.title}</h2>
-          <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.challenge}</p>
+          {/* Leads with the outcome rather than the setup — more compelling
+              as a card teaser; challenge/solution live on the detail page. */}
+          <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.result}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {item.technologies.slice(0, 4).map((tech) => (
               <span

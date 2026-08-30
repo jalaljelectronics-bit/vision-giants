@@ -57,7 +57,9 @@ export default function ContactPage() {
         ]}
       />
 
-      <section className="mx-auto max-w-container px-6 py-20">
+      {/* pt-32/md:pt-40 clears the fixed floating header, which no longer
+          reserves its own space in normal document flow. */}
+      <section className="mx-auto max-w-container px-6 pb-20 pt-32 md:pt-40">
         <div className="grid gap-16 lg:grid-cols-[1fr_1.2fr]">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-body/50">
