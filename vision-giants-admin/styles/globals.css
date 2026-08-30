@@ -574,6 +574,19 @@ a {
 .admin-field-group .admin-field-hint {
   align-self: flex-end;
 }
+.admin-subservice-card {
+  border: 1px solid var(--color-tertiary-accent);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.admin-subservice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
 /* ---------- Two-column form rows (e.g. Job Posting form) ---------- */
 

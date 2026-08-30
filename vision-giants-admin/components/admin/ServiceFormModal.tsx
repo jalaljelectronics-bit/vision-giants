@@ -9,18 +9,27 @@ interface ServiceFormModalProps {
   onSaved: (service: Service) => void;
 }
 
+interface SubServiceState {
+  id: string;
+  title: string;
+  description: string;
+}
+
 interface ServiceFormState {
   title: string;
   slug: string;
   short_description: string;
   description: string;
   image: string;
+  sub_services: SubServiceState[];
   order: number;
 }
 
-function toFormState(
-  service: Service | null
-): ServiceFormState {
+function makeId(): string {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function toFormState(service: Service | null): ServiceFormState {
   if (!service) {
     return {
       title: '',
@@ -28,6 +37,7 @@ function toFormState(
       short_description: '',
       description: '',
       image: '',
+      sub_services: [],
       order: 0,
     };
   }
@@ -38,6 +48,11 @@ function toFormState(
     short_description: service.short_description,
     description: service.description,
     image: service.image || '',
+    sub_services: (service.sub_services || []).map((sub) => ({
+      id: makeId(),
+      title: sub.title,
+      description: sub.description,
+    })),
     order: service.order,
   };
 }
@@ -55,9 +70,7 @@ export default function ServiceFormModal({
   onClose,
   onSaved,
 }: ServiceFormModalProps) {
-  const [form, setForm] = useState<ServiceFormState>(
-    toFormState(service)
-  );
+  const [form, setForm] = useState<ServiceFormState>(toFormState(service));
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,22 +95,59 @@ export default function ServiceFormModal({
     }
   }
 
+  function addSubService() {
+    setForm((prev) => ({
+      ...prev,
+      sub_services: [
+        ...prev.sub_services,
+        { id: makeId(), title: '', description: '' },
+      ],
+    }));
+  }
+
+  function removeSubService(id: string) {
+    setForm((prev) => ({
+      ...prev,
+      sub_services: prev.sub_services.filter((sub) => sub.id !== id),
+    }));
+  }
+
+  function updateSubService(
+    id: string,
+    field: 'title' | 'description',
+    value: string
+  ) {
+    setForm((prev) => ({
+      ...prev,
+      sub_services: prev.sub_services.map((sub) =>
+        sub.id === id ? { ...sub, [field]: value } : sub
+      ),
+    }));
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     setError(null);
     setIsSaving(true);
 
+    const payload = {
+      title: form.title,
+      slug: form.slug,
+      short_description: form.short_description,
+      description: form.description,
+      image: form.image,
+      sub_services: form.sub_services.map(({ title, description }) => ({
+        title,
+        description,
+      })),
+      order: form.order,
+    };
+
     try {
       const res = isEditing
-        ? await adminApi.put<Service>(
-            `/services/${service!.id}`,
-            form
-          )
-        : await adminApi.post<Service>(
-            '/services',
-            form
-          );
+        ? await adminApi.put<Service>(`/services/${service!.id}`, payload)
+        : await adminApi.post<Service>('/services', payload);
 
       if (!res.data) {
         throw new Error('No data returned');
@@ -107,130 +157,154 @@ export default function ServiceFormModal({
     } catch (err) {
       console.error('Failed to save service:', err);
 
-      setError(
-        'Could not save service. Check the fields and try again.'
-      );
+      setError('Could not save service. Check the fields and try again.');
     } finally {
       setIsSaving(false);
     }
   }
 
   return (
-    <div
-      className="admin-modal-overlay"
-      onClick={onClose}
-    >
+    <div className="admin-modal-overlay" onClick={onClose}>
       <form
-        className="admin-modal admin-modal-form"
+        className="admin-modal admin-modal-form admin-modal-form-large"
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
       >
-        <h2>
-          {isEditing
-            ? 'Edit Service'
-            : 'Add Service'}
-        </h2>
+        <h2>{isEditing ? 'Edit Service' : 'Add Service'}</h2>
+        <p className="admin-field-hint">Shown on the public Services page.</p>
 
-        <label htmlFor="title">
-          Title
-        </label>
+        <div className="admin-field-group">
+          <label htmlFor="title">Title</label>
+          <input
+            id="title"
+            value={form.title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          id="title"
-          value={form.title}
-          onChange={(e) =>
-            handleTitleChange(e.target.value)
-          }
-          required
-        />
+        <div className="admin-field-group">
+          <label htmlFor="slug">Slug</label>
+          <input
+            id="slug"
+            value={form.slug}
+            onChange={(e) => updateField('slug', e.target.value)}
+            required
+          />
+        </div>
 
-        <label htmlFor="slug">
-          Slug
-        </label>
+        <div className="admin-field-group">
+          <label htmlFor="short_description">Short description</label>
+          <textarea
+            id="short_description"
+            value={form.short_description}
+            onChange={(e) => updateField('short_description', e.target.value)}
+            rows={2}
+            required
+          />
+          <span className="admin-field-hint">
+            Used on listing and home page cards.
+          </span>
+        </div>
 
-        <input
-          id="slug"
-          value={form.slug}
-          onChange={(e) =>
-            updateField('slug', e.target.value)
-          }
-          required
-        />
+        <div className="admin-field-group">
+          <label htmlFor="description">Full description</label>
+          <textarea
+            id="description"
+            value={form.description}
+            onChange={(e) => updateField('description', e.target.value)}
+            rows={5}
+            required
+          />
+          <span className="admin-field-hint">
+            Start a line with &apos;- &apos; to make it a bullet point.
+          </span>
+        </div>
 
-        <label htmlFor="short_description">
-          Short Description
-        </label>
+        <div className="admin-field-group">
+          <label>Service Image</label>
+          <CloudinaryUpload
+            value={form.image}
+            onChange={(url) =>
+              updateField('image', typeof url === 'string' ? url : '')
+            }
+            label={form.image ? 'Replace Image' : 'Upload Image'}
+          />
+        </div>
 
-        <textarea
-          id="short_description"
-          value={form.short_description}
-          onChange={(e) =>
-            updateField(
-              'short_description',
-              e.target.value
-            )
-          }
-          rows={2}
-          required
-        />
+        <fieldset className="admin-fieldset">
+          <legend>Sub-services</legend>
 
-        <label htmlFor="description">
-          Full Description
-        </label>
+          <div className="admin-page-header">
+            <span />
+            <button
+              type="button"
+              onClick={addSubService}
+              className="admin-button-secondary"
+            >
+              + Add sub-service
+            </button>
+          </div>
 
-        <textarea
-          id="description"
-          value={form.description}
-          onChange={(e) =>
-            updateField(
-              'description',
-              e.target.value
-            )
-          }
-          rows={5}
-          required
-        />
+          {form.sub_services.map((sub, index) => (
+            <div key={sub.id} className="admin-subservice-card">
+              <div className="admin-subservice-header">
+                <span className="admin-field-hint">
+                  SUB-SERVICE {index + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeSubService(sub.id)}
+                  className="admin-table-action admin-table-action-danger"
+                  aria-label="Remove sub-service"
+                >
+                  🗑
+                </button>
+              </div>
 
-        <label>
-          Service Image
-        </label>
+              <div className="admin-field-group">
+                <label htmlFor={`sub-title-${sub.id}`}>Title</label>
+                <input
+                  id={`sub-title-${sub.id}`}
+                  value={sub.title}
+                  onChange={(e) =>
+                    updateSubService(sub.id, 'title', e.target.value)
+                  }
+                  required
+                />
+              </div>
 
-        <CloudinaryUpload
-          value={form.image}
-          onChange={(url) =>
-            updateField(
-              'image',
-              typeof url === 'string' ? url : ''
-            )
-          }
-          label={
-            form.image
-              ? 'Replace Image'
-              : 'Upload Image'
-          }
-        />
+              <div className="admin-field-group">
+                <label htmlFor={`sub-desc-${sub.id}`}>Description</label>
+                <textarea
+                  id={`sub-desc-${sub.id}`}
+                  value={sub.description}
+                  onChange={(e) =>
+                    updateSubService(sub.id, 'description', e.target.value)
+                  }
+                  rows={2}
+                  required
+                />
+                <span className="admin-field-hint">
+                  Start a line with &apos;- &apos; to make it a bullet point.
+                </span>
+              </div>
+            </div>
+          ))}
+        </fieldset>
 
-        <label htmlFor="order">
-          Display Order
-        </label>
+        <div className="admin-field-group">
+          <label htmlFor="order">Display order</label>
+          <input
+            id="order"
+            type="number"
+            value={form.order}
+            onChange={(e) => updateField('order', Number(e.target.value))}
+          />
+          <span className="admin-field-hint">Lower numbers appear first.</span>
+        </div>
 
-        <input
-          id="order"
-          type="number"
-          value={form.order}
-          onChange={(e) =>
-            updateField(
-              'order',
-              Number(e.target.value)
-            )
-          }
-        />
-
-        {error && (
-          <p className="admin-error-text">
-            {error}
-          </p>
-        )}
+        {error && <p className="admin-error-text">{error}</p>}
 
         <div className="admin-modal-actions">
           <button
@@ -241,16 +315,8 @@ export default function ServiceFormModal({
             Cancel
           </button>
 
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="admin-button-primary"
-          >
-            {isSaving
-              ? 'Saving…'
-              : isEditing
-                ? 'Save Changes'
-                : 'Create'}
+          <button type="submit" disabled={isSaving} className="admin-button-primary">
+            {isSaving ? 'Saving…' : isEditing ? 'Save Changes' : 'Create'}
           </button>
         </div>
       </form>
