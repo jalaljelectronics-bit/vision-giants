@@ -22,7 +22,7 @@ export interface PortfolioItem {
   id: number;
   title: string;
   slug: string;
-  client_name: string;
+  project_url: string;
   related_service_id: number | null;
   cover_image: string;
   challenge: string;
