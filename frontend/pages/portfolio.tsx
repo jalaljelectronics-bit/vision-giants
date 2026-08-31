@@ -10,7 +10,7 @@ import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig, cn } from '@/lib/utils';
 import type { PortfolioItem, Testimonial } from '@/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, LayoutGrid } from 'lucide-react';
 
 interface Props {
   items: PortfolioItem[];
@@ -43,6 +43,7 @@ export default function PortfolioPage({ items, testimonials }: Props) {
         eyebrow="Our Work"
         title="Case studies, not just screenshots"
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Portfolio' }]}
+        icon={LayoutGrid}
       />
 
       <section className="mx-auto max-w-container px-6 py-20">
@@ -110,13 +111,7 @@ export default function PortfolioPage({ items, testimonials }: Props) {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
-    const [allItems, testimonials] = await Promise.all([
-      api.getPortfolio(),
-      api.getTestimonials(),
-    ]);
-
-    const items = allItems.filter((item) => !item.is_draft);
-
+    const [items, testimonials] = await Promise.all([api.getPortfolio(), api.getTestimonials()]);
     return { props: { items, testimonials }, revalidate: 3600 };
   } catch {
     return { props: { items: [], testimonials: [] }, revalidate: 60 };
