@@ -6,7 +6,7 @@ import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { PortfolioItem } from '@/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 
 interface Props {
   item: PortfolioItem;
@@ -31,10 +31,7 @@ export default function PortfolioDetailPage({ item }: Props) {
       />
 
       <article className="mx-auto max-w-4xl px-6 py-20">
-        <p className="font-mono text-xs uppercase tracking-widest text-body/50">
-          {item.client_name}
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-semibold text-primary md:text-5xl">
+        <h1 className="font-display text-4xl font-semibold text-primary md:text-5xl">
           {item.title}
         </h1>
 
@@ -81,9 +78,14 @@ export default function PortfolioDetailPage({ item }: Props) {
           <h2 className="font-display text-2xl font-semibold text-primary">
             Want a project like this one?
           </h2>
-          <Button href="/contact" size="lg" className="mt-6">
-            Start a Project <ArrowRight size={16} />
-          </Button>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+            <Button href="/contact" size="lg">
+              Start a Project <ArrowRight size={16} />
+            </Button>
+            <Button href={item.project_url} size="lg" variant="secondary" target="_blank" rel="noopener noreferrer">
+              Visit live site <ExternalLink size={16} />
+            </Button>
+          </div>
         </div>
       </article>
     </>
@@ -114,4 +116,4 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   } catch {
     return { notFound: true };
   }
-};
+};s

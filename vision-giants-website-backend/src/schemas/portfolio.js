@@ -3,7 +3,7 @@ const { z } = require('zod');
 module.exports = z.object({
   title: z.string().min(1).max(255),
   slug: z.string().min(1).max(255),
-  client_name: z.string().min(1),
+  project_url: z.string().url(),
   related_service_id: z.number().int().nullable().optional(),
   cover_image: z.string().url(),
   technologies: z.array(z.string()).optional(),

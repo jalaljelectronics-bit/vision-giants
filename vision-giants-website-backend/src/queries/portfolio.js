@@ -6,7 +6,7 @@ const getBySlug = (slug) => query('SELECT * FROM portfolio WHERE slug = $1', [sl
 const create = ({
   title,
   slug,
-  client_name,
+  project_url,
   related_service_id,
   cover_image,
   technologies,
@@ -19,12 +19,12 @@ const create = ({
 }) =>
   query(
     `INSERT INTO portfolio
-       (title, slug, client_name, related_service_id, cover_image, technologies, challenge, solution, result, featured, is_new_arrival, is_draft)
+       (title, slug, project_url, related_service_id, cover_image, technologies, challenge, solution, result, featured, is_new_arrival, is_draft)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
     [
       title,
       slug,
-      client_name,
+      project_url,
       related_service_id || null,
       cover_image,
       JSON.stringify(technologies || []),
@@ -41,7 +41,7 @@ const update = (
   id,
   {
     title,
-    client_name,
+    project_url,
     related_service_id,
     cover_image,
     technologies,
@@ -56,7 +56,7 @@ const update = (
   query(
     `UPDATE portfolio SET
        title=$1,
-       client_name=$2,
+       project_url=$2,
        related_service_id=$3,
        cover_image=$4,
        technologies=$5,
@@ -70,7 +70,7 @@ const update = (
      WHERE id=$12 RETURNING *`,
     [
       title,
-      client_name,
+      project_url,
       related_service_id || null,
       cover_image,
       JSON.stringify(technologies || []),

@@ -11,7 +11,7 @@ interface PortfolioFormModalProps {
 interface PortfolioFormState {
   title: string;
   slug: string;
-  client_name: string;
+  project_url: string;
   related_service_id: number | null;
   cover_image: string;
   technologies: string;
@@ -30,7 +30,7 @@ function toFormState(
     return {
       title: '',
       slug: '',
-      client_name: '',
+      project_url: '',
       related_service_id: null,
       cover_image: '',
       technologies: '',
@@ -46,7 +46,7 @@ function toFormState(
   return {
     title: item.title,
     slug: item.slug,
-    client_name: item.client_name,
+    project_url: item.project_url,
     related_service_id: item.related_service_id ?? null,
     cover_image: item.cover_image || '',
     technologies: item.technologies.join(', '),
@@ -75,11 +75,6 @@ function parseList(value: string): string[] {
 }
 
 // ---------- Local component: CoverImageUpload ----------
-// Single cover-image field: dropzone preview, Cloudinary upload button,
-// and a paste-URL fallback. Kept local since it's only used here —
-// the shared CloudinaryUpload component still powers the multi-image
-// fields on Blog/Service/Team/Testimonial.
-
 interface CloudinaryResult {
   secure_url: string;
 }
@@ -297,8 +292,6 @@ function CoverImageUpload({ value, onChange }: CoverImageUploadProps) {
 }
 
 // ---------- Local component: ToggleSwitch ----------
-// Small pill switch used for Featured / New Arrival / Draft below.
-
 interface ToggleSwitchProps {
   label: string;
   checked: boolean;
@@ -374,7 +367,7 @@ export default function PortfolioFormModal({
     const payload = {
       title: form.title,
       slug: form.slug,
-      client_name: form.client_name,
+      project_url: form.project_url,
       related_service_id: form.related_service_id,
       cover_image: form.cover_image,
       technologies: parseList(form.technologies),
@@ -388,7 +381,7 @@ export default function PortfolioFormModal({
 
     if (
       !payload.title ||
-      !payload.client_name ||
+      !payload.project_url ||
       !payload.cover_image ||
       !payload.challenge ||
       !payload.solution ||
@@ -463,19 +456,21 @@ export default function PortfolioFormModal({
           </div>
 
           <div className="admin-form-field">
-            <label htmlFor="client_name">
-              Client name <span className="admin-required">*</span>
+            <label htmlFor="project_url">
+              Project URL <span className="admin-required">*</span>
             </label>
 
             <input
-              id="client_name"
-              value={form.client_name}
+              id="project_url"
+              type="url"
+              value={form.project_url}
               onChange={(e) =>
                 updateField(
-                  'client_name',
+                  'project_url',
                   e.target.value
                 )
               }
+              placeholder="https://client-site.com"
               required
             />
           </div>

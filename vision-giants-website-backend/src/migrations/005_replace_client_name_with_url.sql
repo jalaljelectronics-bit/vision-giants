@@ -1,0 +1,5 @@
+ALTER TABLE portfolio
+  ADD COLUMN IF NOT EXISTS project_url VARCHAR(500);
+
+ALTER TABLE portfolio
+  DROP COLUMN IF EXISTS client_name;

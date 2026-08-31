@@ -37,10 +37,7 @@ export function PortfolioCard({ item }: PortfolioCardProps) {
           </div>
         </div>
         <div className="p-6">
-          <p className="font-mono text-xs uppercase tracking-widest text-body/50">
-            {item.client_name}
-          </p>
-          <h2 className="mt-2 font-display text-xl font-semibold text-primary">{item.title}</h2>
+          <h2 className="font-display text-xl font-semibold text-primary">{item.title}</h2>
           <p className="mt-2 line-clamp-2 text-sm text-body/70">{item.challenge}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {item.technologies.slice(0, 4).map((tech) => (

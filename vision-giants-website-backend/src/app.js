@@ -44,7 +44,6 @@ app.use('/api/team', require('./routes/team'));
 app.use('/api/testimonials', require('./routes/testimonials'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/applications', require('./routes/applications'));
-
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/admin', require('./routes/admin'));
 

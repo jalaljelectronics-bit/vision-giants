@@ -14,7 +14,7 @@ export interface PortfolioItem {
   id: number;
   title: string;
   slug: string;
-  client_name: string;
+  project_url: string;
   related_service_id: number | null;
   cover_image: string;
   challenge: string;
@@ -26,7 +26,6 @@ export interface PortfolioItem {
   is_draft: boolean;
   created_at: string;
 }
-
 export interface TeamMember {
   id: number;
   name: string;
