@@ -6,6 +6,7 @@ import { BlogCard } from '@/components/sections/BlogCard';
 import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig, cn } from '@/lib/utils';
+import { Newspaper } from 'lucide-react';
 import type { BlogPost } from '@/types';
 
 interface Props {
@@ -31,6 +32,7 @@ export default function BlogPage({ posts }: Props) {
         eyebrow="Blog"
         title="Notes from the studio"
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog' }]}
+        icon={Newspaper}
       />
 
       <section className="mx-auto max-w-container px-6 py-20">

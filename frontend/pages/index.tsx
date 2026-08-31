@@ -4,7 +4,6 @@ import { Seo } from '@/components/seo/Seo';
 import { Hero } from '@/components/sections/Hero';
 import { Testimonials } from '@/components/sections/Testimonials';
 import { PortfolioCard } from '@/components/sections/PortfolioCard';
-import { ServiceCard } from '@/components/sections/ServiceCard';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Reveal, RevealItem } from '@/components/motion/Reveal';
@@ -56,7 +55,7 @@ export default function HomePage({ testimonials, featuredPortfolio, services }: 
         path="/"
       />
 
-      <Hero />
+      <Hero services={services} />
 
       {/* CEO intro block */}
       <section className="mx-auto max-w-container px-6 py-20">
@@ -147,30 +146,6 @@ export default function HomePage({ testimonials, featuredPortfolio, services }: 
                 <PortfolioCard key={item.slug} item={item} />
               ))}
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* Services */}
-      {services.length > 0 && (
-        <section className="mx-auto max-w-container px-6 py-20">
-          <Reveal className="flex items-end justify-between gap-6">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-body/50">
-                What We Do
-              </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-primary md:text-4xl">
-                Services built around outcomes
-              </h2>
-            </div>
-            <Button href="/services" variant="ghost" size="sm" className="hidden md:inline-flex">
-              All Services <ArrowRight size={14} />
-            </Button>
-          </Reveal>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {services.slice(0, 4).map((service) => (
-              <ServiceCard key={service.slug} service={service} />
-            ))}
           </div>
         </section>
       )}

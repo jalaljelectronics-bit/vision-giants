@@ -8,7 +8,7 @@ import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { TeamMember } from '@/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import Image from 'next/image';
 
 interface Props {
@@ -57,6 +57,7 @@ export default function AboutPage({ team }: Props) {
         eyebrow="About Us"
         title="A studio built by people who ship"
         crumbs={[{ label: 'Home', href: '/' }, { label: 'About' }]}
+        icon={Users}
       />
 
       <section className="mx-auto max-w-container px-6 py-20">

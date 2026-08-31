@@ -8,7 +8,7 @@ import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { Service } from '@/types';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Code2 } from 'lucide-react';
 
 interface Props {
   service: Service;
@@ -39,6 +39,7 @@ export default function ServiceDetailPage({ service }: Props) {
           { label: 'Services', href: '/services' },
           { label: service.title },
         ]}
+        icon={Code2}
       />
 
       <article className="mx-auto max-w-3xl px-6 py-20">
