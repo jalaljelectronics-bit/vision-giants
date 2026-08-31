@@ -94,8 +94,7 @@ export default function PortfolioDetailPage({ item }: Props) {
               href={item.project_url}
               size="lg"
               variant="secondary"
-              target="_blank"
-              rel="noopener noreferrer"
+              external
             >
               Visit live site <ExternalLink size={16} />
             </Button>
