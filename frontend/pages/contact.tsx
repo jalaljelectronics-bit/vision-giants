@@ -10,7 +10,7 @@ import { Mail, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 // siteConfig doesn't carry contact details yet — hardcoded here for now.
 // Consider adding `email` / `location` to siteConfig in lib/utils.ts so
 // this page (and the footer, if it needs it) can share one source of truth.
-const CONTACT_EMAIL = 'hello@visiongiants.com';
+const CONTACT_EMAIL = 'info@vgiants.com';
 const CONTACT_LOCATION = 'Remote-first, worldwide';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
