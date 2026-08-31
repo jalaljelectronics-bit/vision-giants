@@ -1,5 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Seo } from '@/components/seo/Seo';
 import { Button } from '@/components/ui/Button';
 import { BreadcrumbJsonLd, ArticleJsonLd } from '@/components/seo/JsonLd';
@@ -60,10 +62,9 @@ export default function BlogPostPage({ post }: Props) {
           />
         </div>
 
-        <div
-          className="prose prose-slate mt-10 max-w-none prose-headings:font-display prose-headings:text-primary prose-a:text-primary"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <div className="prose prose-slate mt-10 max-w-none prose-headings:font-display prose-headings:text-primary prose-a:text-primary prose-img:rounded-xl">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+        </div>
 
         <div className="mt-14 rounded-2xl border border-tertiary/40 bg-primary-container/30 p-8 text-center">
           <h2 className="font-display text-2xl font-semibold text-primary">

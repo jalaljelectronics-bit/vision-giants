@@ -1,5 +1,4 @@
 // components/admin/RichTextEditor.tsx
-// Placeholder implementation — swap for Tiptap once the dependency is approved.
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -11,8 +10,8 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
       className="admin-rich-text-placeholder"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      rows={12}
-      placeholder="Blog content (plain text for now — rich text editor pending)"
+      rows={16}
+      placeholder={'Paste or write your post in Markdown:\n\n# Heading\n**bold**, *italic*\n- list item\n[link](https://example.com)\n![alt text](https://image-url.com)'}
     />
   );
 }
