@@ -72,10 +72,15 @@ export default function ServiceFormModal({
 }: ServiceFormModalProps) {
   const [form, setForm] = useState<ServiceFormState>(toFormState(service));
 
+  // Once the user edits the slug directly, stop auto-generating it from the title.
+  const [slugTouched, setSlugTouched] = useState(false);
+
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isEditing = Boolean(service);
+  const originalSlug = service?.slug ?? '';
+  const slugChanged = isEditing && form.slug !== originalSlug;
 
   function updateField<K extends keyof ServiceFormState>(
     key: K,
@@ -90,9 +95,14 @@ export default function ServiceFormModal({
   function handleTitleChange(value: string) {
     updateField('title', value);
 
-    if (!isEditing) {
+    if (!slugTouched) {
       updateField('slug', slugify(value));
     }
+  }
+
+  function handleSlugChange(value: string) {
+    setSlugTouched(true);
+    updateField('slug', slugify(value));
   }
 
   function addSubService() {
@@ -128,6 +138,13 @@ export default function ServiceFormModal({
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
+    if (slugChanged) {
+      const confirmed = window.confirm(
+        `Changing the slug from "${originalSlug}" to "${form.slug}" will change this page's URL. The old link (/services/${originalSlug}) will stop working. Continue?`
+      );
+      if (!confirmed) return;
+    }
+
     setError(null);
     setIsSaving(true);
 
@@ -154,10 +171,16 @@ export default function ServiceFormModal({
       }
 
       onSaved(res.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save service:', err);
 
-      setError('Could not save service. Check the fields and try again.');
+      // Surface the backend's uniqueness error distinctly, if present.
+      const message =
+        err?.response?.status === 409
+          ? 'That slug is already in use by another service.'
+          : 'Could not save service. Check the fields and try again.';
+
+      setError(message);
     } finally {
       setIsSaving(false);
     }
@@ -188,9 +211,20 @@ export default function ServiceFormModal({
           <input
             id="slug"
             value={form.slug}
-            onChange={(e) => updateField('slug', e.target.value)}
+            onChange={(e) => handleSlugChange(e.target.value)}
             required
           />
+          <span className="admin-field-hint">
+            {isEditing
+              ? `URL: /services/${form.slug || '…'}`
+              : 'Auto-filled from the title — edit if you want a custom URL.'}
+          </span>
+          {slugChanged && (
+            <span className="admin-field-hint admin-error-text">
+              Changing this will break the old URL (/services/{originalSlug})
+              unless you set up a redirect.
+            </span>
+          )}
         </div>
 
         <div className="admin-field-group">

@@ -2,6 +2,7 @@ const { query } = require('../db');
 
 const getAll = () => query('SELECT * FROM services ORDER BY "order" ASC');
 const getBySlug = (slug) => query('SELECT * FROM services WHERE slug = $1', [slug]);
+const getById = (id) => query('SELECT * FROM services WHERE id = $1', [id]);
 
 const create = ({
   title,
@@ -29,20 +30,22 @@ const create = ({
 
 const update = (
   id,
-  { title, short_description, description, image, sub_services, order }
+  { title, slug, short_description, description, image, sub_services, order }
 ) =>
   query(
     `UPDATE services SET
        title=$1,
-       short_description=$2,
-       description=$3,
-       image=$4,
-       sub_services=$5,
-       "order"=$6,
+       slug=$2,
+       short_description=$3,
+       description=$4,
+       image=$5,
+       sub_services=$6,
+       "order"=$7,
        updated_at=NOW()
-     WHERE id=$7 RETURNING *`,
+     WHERE id=$8 RETURNING *`,
     [
       title,
+      slug,
       short_description,
       description,
       image,
@@ -54,4 +57,4 @@ const update = (
 
 const remove = (id) => query('DELETE FROM services WHERE id = $1', [id]);
 
-module.exports = { getAll, getBySlug, create, update, remove };
+module.exports = { getAll, getBySlug, getById, create, update, remove };

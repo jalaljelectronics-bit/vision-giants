@@ -15,6 +15,11 @@ exports.getOne = asyncHandler(async (req, res) => {
 });
 
 exports.create = asyncHandler(async (req, res) => {
+  const { rows: dupes } = await services.getBySlug(req.body.slug);
+  if (dupes.length) {
+    return ApiResponse.error(res, 'That slug is already in use', 409);
+  }
+
   const { rows } = await services.create(req.body);
   const service = rows[0];
 
@@ -24,12 +29,25 @@ exports.create = asyncHandler(async (req, res) => {
 });
 
 exports.update = asyncHandler(async (req, res) => {
+  const { rows: existingRows } = await services.getById(req.params.id);
+  if (!existingRows.length) return ApiResponse.error(res, 'Service not found', 404);
+  const oldSlug = existingRows[0].slug;
+
+  if (req.body.slug && req.body.slug !== oldSlug) {
+    const { rows: dupes } = await services.getBySlug(req.body.slug);
+    if (dupes.length) {
+      return ApiResponse.error(res, 'That slug is already in use', 409);
+    }
+  }
+
   const { rows } = await services.update(req.params.id, req.body);
   if (!rows.length) return ApiResponse.error(res, 'Service not found', 404);
 
   const service = rows[0];
 
-  revalidatePaths(['/services', `/services/${service.slug}`]);
+  const paths = ['/services', `/services/${service.slug}`];
+  if (oldSlug !== service.slug) paths.push(`/services/${oldSlug}`);
+  revalidatePaths(paths);
 
   ApiResponse.success(res, service);
 });
