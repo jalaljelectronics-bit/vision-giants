@@ -11,7 +11,7 @@ import { Mail, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 // Consider adding `email` / `location` to siteConfig in lib/utils.ts so
 // this page (and the footer, if it needs it) can share one source of truth.
 const CONTACT_EMAIL = 'info@vgiants.com';
-const CONTACT_LOCATION = 'Remote-first, worldwide';
+const CONTACT_LOCATION = 'Citi Mall 2nd floor,Gulgasht Colony,Multan.';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 

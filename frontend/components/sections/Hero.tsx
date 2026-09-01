@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight, CheckCircle2, Play } from 'lucide-react';
@@ -12,21 +14,8 @@ const CHECKLIST = [
   'Code you fully own, day one',
 ];
 
-// The three preview-card tones cycle by position (1st/2nd/3rd card),
-// not by which service happens to be showing — so the row always reads
-// as "dark / mid / light" regardless of which real services rotate through.
-const CARD_TONES = [
-  { box: 'chrome-shimmer', heading: 'text-white', body: 'text-white/80', meta: 'text-white/70' },
-  { box: 'bg-secondary', heading: 'text-white', body: 'text-white/80', meta: 'text-white/70' },
-  {
-    box: 'bg-primary-container border border-tertiary/40',
-    heading: 'text-primary',
-    body: 'text-body/70',
-    meta: 'text-primary/70',
-  },
-];
-
-const ROTATE_MS = 3000;
+// How long each service holds the spotlight before advancing.
+const ROTATE_MS = 4000;
 
 interface HeroProps {
   services: Service[];
@@ -35,26 +24,18 @@ interface HeroProps {
 export function Hero({ services }: HeroProps) {
   const reduceMotion = useReducedMotion();
 
-  // Split the real services into groups of 3, and cycle through the groups.
-  const groups = useMemo(() => {
-    const chunks: Service[][] = [];
-    for (let i = 0; i < services.length; i += 3) {
-      chunks.push(services.slice(i, i + 3));
-    }
-    return chunks;
-  }, [services]);
+  const [index, setIndex] = useState(0);
+  const active = services[index];
 
-  const [groupIndex, setGroupIndex] = useState(0);
-
+  // setTimeout (not setInterval) rescheduled on every index change, so a
+  // manual tab click (if reintroduced later) restarts the hold time.
   useEffect(() => {
-    if (reduceMotion || groups.length <= 1) return;
-    const id = setInterval(() => {
-      setGroupIndex((i) => (i + 1) % groups.length);
+    if (reduceMotion || services.length <= 1) return;
+    const id = setTimeout(() => {
+      setIndex((i) => (i + 1) % services.length);
     }, ROTATE_MS);
-    return () => clearInterval(id);
-  }, [groups.length, reduceMotion]);
-
-  const currentGroup = groups[groupIndex] ?? [];
+    return () => clearTimeout(id);
+  }, [index, services.length, reduceMotion]);
 
   return (
     <section className="relative isolate overflow-hidden pb-28 md:pb-36">
@@ -137,79 +118,72 @@ export function Hero({ services }: HeroProps) {
             </motion.div>
           </div>
 
-          {/* Stat block standing in for the reference site's device mockup —
-              kept in-palette rather than dropping in an unrelated photo. */}
-          <motion.div
-            variants={fadeUp}
-            className="hidden rounded-3xl border border-white/15 bg-white/5 p-8 backdrop-blur-sm lg:block"
-          >
-            <dl className="grid grid-cols-2 gap-8">
-              {[
-                { label: 'Projects Shipped', value: '120+' },
-                { label: 'Years Building', value: '8' },
-                { label: 'Client Retention', value: '94%' },
-                { label: 'Engineers on Team', value: '24' },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <dt className="font-mono text-xs uppercase tracking-widest text-white/50">{stat.label}</dt>
-                  <dd className="mt-1 font-display text-3xl font-semibold text-white">{stat.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </motion.div>
-        </div>
-
-        {/* Real services, rotating 3-at-a-time */}
-        {currentGroup.length > 0 && (
-          <div className="relative z-10 mt-16 md:mt-20">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={groupIndex}
-                initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-                animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
-                transition={{ duration: 0.5, ease: EASE_PREMIUM }}
-                className="grid gap-4 sm:grid-cols-3"
-              >
-                {currentGroup.map((service, i) => {
-                  const tone = CARD_TONES[i % CARD_TONES.length];
-                  return (
-                    <a
+          {/* Service spotlight card stands in for the reference site's
+              device mockup, auto-rotating through services on a timer.
+              `display: grid` + every card pinned to grid-area 1/1 means
+              the outgoing and incoming cards overlap in the SAME cell
+              instead of stacking in normal flow — so the container's
+              height stays constant and nothing else on the page shifts,
+              no matter how many services get added later. */}
+          {active && (
+            <motion.div variants={fadeUp} className="hidden lg:grid">
+              <AnimatePresence initial={false}>
+                {services.map((service, i) =>
+                  i === index ? (
+                    <motion.div
                       key={service.slug}
-                      href={`/services/${service.slug}`}
-                      className={`sheen block rounded-2xl p-6 shadow-xl shadow-primary/20 transition-transform duration-300 hover:-translate-y-1 ${tone.box}`}
+                      style={{ gridArea: '1 / 1' }}
+                      initial={reduceMotion ? undefined : { opacity: 0 }}
+                      animate={reduceMotion ? undefined : { opacity: 1 }}
+                      exit={reduceMotion ? undefined : { opacity: 0 }}
+                      transition={{ duration: 0.5, ease: EASE_PREMIUM }}
                     >
-                      <h3 className={`font-display text-lg font-semibold ${tone.heading}`}>
-                        {service.title}
-                      </h3>
-                      <p className={`mt-2 text-sm ${tone.body}`}>{service.short_description}</p>
-                      <span
-                        className={`mt-4 inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest ${tone.meta}`}
+                      <Link
+                        href={`/services/${service.slug}`}
+                        className="sheen group block overflow-hidden rounded-3xl border border-white/10 bg-surface shadow-2xl shadow-primary/30"
                       >
-                        Learn more <ArrowRight size={12} />
-                      </span>
-                    </a>
-                  );
-                })}
-              </motion.div>
-            </AnimatePresence>
-
-            {groups.length > 1 && (
-              <div className="mt-6 flex justify-center gap-2">
-                {groups.map((_, i) => (
-                  <button
-                    key={i}
-                    aria-label={`Show services group ${i + 1}`}
-                    onClick={() => setGroupIndex(i)}
-                    className={`h-1.5 rounded-full transition-all ${
-                      i === groupIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/30'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                        <div className="relative aspect-[16/9] overflow-hidden bg-primary-container">
+                          <Image
+                            src={service.image}
+                            alt={service.title}
+                            fill
+                            priority
+                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                          />
+                        </div>
+                        <div className="p-8 md:p-10">
+                          <h3 className="font-display text-xl font-semibold text-primary md:text-2xl">
+                            {service.title}
+                          </h3>
+                          <p className="mt-3 text-sm text-body/70 md:text-base">
+                            {service.short_description}
+                          </p>
+                          {service.sub_services?.length > 0 && (
+                            <div className="mt-5 flex flex-wrap gap-2">
+                              {service.sub_services.slice(0, 3).map((sub) => (
+                                <span
+                                  key={sub.title}
+                                  className="rounded-full bg-primary-container px-3 py-1 font-mono text-[10px] uppercase tracking-wide text-primary"
+                                >
+                                  {sub.title}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <span className="mt-6 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-primary">
+                            View details
+                            <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
+                          </span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ) : null
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </div>
       </motion.div>
     </section>
   );
