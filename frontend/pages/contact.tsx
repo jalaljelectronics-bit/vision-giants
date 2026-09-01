@@ -5,13 +5,14 @@ import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
-import { Mail, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
+import { Mail, MapPin, Phone, Loader2, CheckCircle2 } from 'lucide-react';
 
 // siteConfig doesn't carry contact details yet — hardcoded here for now.
 // Consider adding `email` / `location` to siteConfig in lib/utils.ts so
 // this page (and the footer, if it needs it) can share one source of truth.
 const CONTACT_EMAIL = 'info@vgiants.com';
 const CONTACT_LOCATION = 'Citi Mall 2nd floor,Gulgasht Colony,Multan.';
+const CONTACT_PHONES = ['+923080058600', '+923176572690'];
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -85,6 +86,15 @@ export default function ContactPage() {
               <p className="flex items-center gap-3 text-body/80">
                 <MapPin size={18} /> {CONTACT_LOCATION}
               </p>
+              {CONTACT_PHONES.map((phone) => (
+                <a
+                  key={phone}
+                  href={`tel:${phone}`}
+                  className="flex items-center gap-3 text-body/80 hover:text-primary"
+                >
+                  <Phone size={18} /> {phone}
+                </a>
+              ))}
             </div>
           </div>
 

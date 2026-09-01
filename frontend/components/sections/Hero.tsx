@@ -86,6 +86,38 @@ export function Hero({ services }: HeroProps) {
               Enterprise-grade software, built by a studio that ships.
             </motion.h1>
 
+            {/* Synced with the spotlight card on the right: same index,
+                same crossfade duration, so the service name here changes
+                in lockstep with the card instead of independently.
+                `grid-area 1/1` stacking (same trick as the card below)
+                keeps this block's height constant even when service
+                titles are different lengths, so nothing around it jumps. */}
+            {active && (
+              <motion.div variants={fadeUp} className="mt-5 grid">
+                <AnimatePresence initial={false}>
+                  {services.map((service, i) =>
+                    i === index ? (
+                      <motion.div
+                        key={service.slug}
+                        style={{ gridArea: '1 / 1' }}
+                        initial={reduceMotion ? undefined : { opacity: 0 }}
+                        animate={reduceMotion ? undefined : { opacity: 1 }}
+                        exit={reduceMotion ? undefined : { opacity: 0 }}
+                        transition={{ duration: 0.5, ease: EASE_PREMIUM }}
+                      >
+                        <p className="font-mono text-xs uppercase tracking-widest text-white/50">
+                          Our Services:
+                        </p>
+                        <p className="mt-1 font-display text-2xl font-semibold text-white md:text-3xl">
+                          {service.title}
+                        </p>
+                      </motion.div>
+                    ) : null
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+
             <motion.p variants={fadeUp} className="mt-6 max-w-lg text-base text-white/75 md:text-lg">
               Vision Giants partners with founders and product teams to design, build, and ship
               web, mobile, and custom software — from first sketch to production.
