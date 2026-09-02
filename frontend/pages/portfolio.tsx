@@ -8,9 +8,9 @@ import { Testimonials } from '@/components/sections/Testimonials';
 import { Button } from '@/components/ui/Button';
 import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
-import { siteConfig, cn } from '@/lib/utils';
+import { siteConfig, cn, getHostname } from '@/lib/utils';
 import type { PortfolioItem, Testimonial } from '@/types';
-import { ArrowRight, LayoutGrid } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface Props {
   items: PortfolioItem[];
@@ -43,8 +43,48 @@ export default function PortfolioPage({ items, testimonials }: Props) {
         eyebrow="Our Work"
         title="Case studies, not just screenshots"
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Portfolio' }]}
-        icon={LayoutGrid}
+        variant="portfolio"
       />
+
+      {/* Client pill strip — jumps to that project's card below. Inlined
+          here rather than a separate component since it's only used on
+          this one page. Not the same as PortfolioMarquee (home page):
+          this one doesn't auto-scroll or duplicate items, since clicking
+          a pill to jump somewhere doesn't mix well with content also
+          sliding around on its own. */}
+      {items.length > 0 && (
+        <div className="border-y border-tertiary/30 bg-primary-container/10 py-5">
+          <div className="scrollbar-none flex gap-3 overflow-x-auto px-6" style={{ scrollbarWidth: 'none' }}>
+            {items.map((item) => (
+              <button
+                key={item.slug}
+                onClick={() => {
+                  setFilter('All');
+                  requestAnimationFrame(() => {
+                    document.getElementById(`portfolio-${item.slug}`)?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  });
+                }}
+                className="group relative flex shrink-0 items-center gap-2.5 rounded-full border border-tertiary/40 bg-surface px-4 py-2 transition-colors hover:border-primary"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container font-mono text-[11px] font-semibold text-primary">
+                  {item.title.charAt(0).toUpperCase()}
+                </span>
+                <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-body/70 group-hover:text-primary">
+                  {item.title}
+                </span>
+                {getHostname(item.project_url) && (
+                  <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-tertiary/40 bg-surface px-3 py-1.5 text-xs text-primary opacity-0 shadow-lg shadow-primary/10 transition-opacity group-hover:opacity-100">
+                    {getHostname(item.project_url)}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <section className="mx-auto max-w-container px-6 py-20">
         <Reveal className="max-w-xl">
@@ -78,7 +118,7 @@ export default function PortfolioPage({ items, testimonials }: Props) {
         ) : (
           <div className="mt-10 grid gap-8 md:grid-cols-2">
             {filtered.map((item) => (
-              <PortfolioCard key={item.slug} item={item} />
+              <PortfolioCard key={item.slug} item={item} id={`portfolio-${item.slug}`} />
             ))}
           </div>
         )}

@@ -6,7 +6,7 @@ import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { JobPosting } from '@/types';
-import { ArrowRight, MapPin, Briefcase, Rocket } from 'lucide-react';
+import { ArrowRight, MapPin, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
 interface Props {
@@ -34,7 +34,7 @@ export default function CareersPage({ jobs }: Props) {
         eyebrow="Careers"
         title="Build with people who care about the work"
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Careers' }]}
-        icon={Rocket}
+        variant="careers"
       />
 
       <section className="mx-auto max-w-container px-6 py-20">

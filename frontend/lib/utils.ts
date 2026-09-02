@@ -18,6 +18,18 @@ export function readingTime(html: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
+/** Bare hostname for display (e.g. "acme.com") from a PortfolioItem's
+    project_url. Returns an empty string for an empty/malformed URL rather
+    than throwing, since this is used in display-only contexts. */
+export function getHostname(url: string): string {
+  if (!url) return '';
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
+
 export const siteConfig = {
   name: 'Vision Giants',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://visiongiants.com',

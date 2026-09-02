@@ -153,3 +153,57 @@ h1, h2, h3, h4 {
 .animate-drift-b {
   animation: drift-b 18s ease-in-out infinite;
 }
+
+/* Hides the scrollbar on horizontally-scrollable strips (e.g. ClientStrip)
+   while keeping the element scrollable — Tailwind has no built-in utility
+   for this. Firefox is handled inline via style={scrollbarWidth: 'none'}. */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Continuous auto-scroll for PortfolioMarquee. Content is rendered twice
+   (see the component), so translating exactly -50% completes one full
+   cycle and loops back to 0% with no visible jump or seam. */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-scroll 30s linear infinite;
+}
+
+/* Floating light particles used on HeroBand — this class was referenced
+   there but never actually defined, so the particles were rendering as
+   inert, motionless dots. Each particle rises and fades in a loose loop;
+   per-particle left/delay/duration come from inline styles set in the
+   component, this just supplies the shared animation itself. */
+@keyframes particle-drift {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(-40px) scale(1.4); opacity: 0; }
+}
+.particle {
+  animation-name: particle-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Slow diagonal pan for HeroBand's line-pattern texture. */
+@keyframes grid-pan {
+  from { background-position: 0 0; }
+  to { background-position: 200px 200px; }
+}
+.animate-grid-pan {
+  animation: grid-pan 20s linear infinite;
+}
+
+/* Infinite horizontal marquee for ClientStrip. Content is duplicated in
+   the component, so translating exactly -50% loops seamlessly. */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-scroll 32s linear infinite;
+}

@@ -8,7 +8,7 @@ import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { Service } from '@/types';
-import { ArrowRight, Code2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface Props {
   services: Service[];
@@ -33,7 +33,7 @@ export default function ServicesPage({ services }: Props) {
         eyebrow="Services"
         title="What we build"
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Services' }]}
-        icon={Code2}
+        variant="services"
       />
 
       <section className="mx-auto max-w-container px-6 py-20">

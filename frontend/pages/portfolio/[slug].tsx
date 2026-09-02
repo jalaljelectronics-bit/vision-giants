@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/Button';
 import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
-import { siteConfig } from '@/lib/utils';
+import { siteConfig, getHostname } from '@/lib/utils';
 import type { PortfolioItem } from '@/types';
-import { ArrowRight, ExternalLink, Target, Wrench, TrendingUp } from 'lucide-react';
+import { ArrowRight, Target, Wrench, TrendingUp, ExternalLink } from 'lucide-react';
 
 interface Props {
   item: PortfolioItem;
@@ -41,7 +41,17 @@ export default function PortfolioDetailPage({ item }: Props) {
           reserves its own space in normal document flow. */}
       <article className="mx-auto max-w-4xl px-6 pb-20 pt-32 md:pt-40">
         <Reveal>
-          <h1 className="font-display text-4xl font-semibold text-primary md:text-5xl">
+          {getHostname(item.project_url) && (
+            <a
+              href={item.project_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-body/50 hover:text-primary"
+            >
+              {getHostname(item.project_url)} <ExternalLink size={12} />
+            </a>
+          )}
+          <h1 className="mt-2 font-display text-4xl font-semibold text-primary md:text-5xl">
             {item.title}
           </h1>
 
@@ -86,19 +96,9 @@ export default function PortfolioDetailPage({ item }: Props) {
           <h2 className="font-display text-2xl font-semibold text-primary">
             Want a project like this one?
           </h2>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Button href="/contact" size="lg">
-              Start a Project <ArrowRight size={16} />
-            </Button>
-            <Button
-              href={item.project_url}
-              size="lg"
-              variant="secondary"
-              external
-            >
-              Visit live site <ExternalLink size={16} />
-            </Button>
-          </div>
+          <Button href="/contact" size="lg" className="mt-6">
+            Start a Project <ArrowRight size={16} />
+          </Button>
         </Reveal>
       </article>
     </>
