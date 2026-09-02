@@ -47,7 +47,7 @@ export default function CareersPage({ jobs }: Props) {
 
         {openJobs.length === 0 ? (
           <p className="mt-16 text-body/50">
-            No open roles right now — check back soon, or reach out anyway.
+            No open roles right now — check back soon, and see or reach out anyway.
           </p>
         ) : (
           <Reveal className="mt-14 divide-y divide-tertiary/30 border-y border-tertiary/30">
