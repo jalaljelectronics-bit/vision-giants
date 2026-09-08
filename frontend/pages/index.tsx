@@ -148,7 +148,7 @@ export default function HomePage({ testimonials, featuredPortfolio, allPortfolio
           <div className="relative">
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
               <Image
-                src="/videos/hero-bg-poster.jpg"
+                src="https://res.cloudinary.com/r2fk1fws/image/upload/v1788878018/WhatsApp_Image_2026-09-08_at_19.05.13_o5gyqw.jpg"
                 alt="The Vision Giants team at work"
                 fill
                 className="object-cover"
