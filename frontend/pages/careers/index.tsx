@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { GetStaticProps } from 'next';
 import { Seo } from '@/components/seo/Seo';
 import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
@@ -13,8 +14,19 @@ interface Props {
   jobs: JobPosting[];
 }
 
-export default function CareersPage({ jobs }: Props) {
-  const openJobs = jobs.filter((j) => j.is_active);
+export default function CareersPage({ jobs = [] }: Props) {
+  const [jobList, setJobList] = useState<JobPosting[]>(jobs || []);
+
+  useEffect(() => {
+    if (!jobs || jobs.length === 0) {
+      api
+        .getJobs()
+        .then((data) => setJobList(data || []))
+        .catch(() => {});
+    }
+  }, [jobs]);
+
+  const openJobs = (jobList || []).filter((j) => j && j.is_active);
 
   return (
     <>
@@ -47,12 +59,12 @@ export default function CareersPage({ jobs }: Props) {
 
         {openJobs.length === 0 ? (
           <p className="mt-16 text-body/50">
-            No open roles right now — check back soon, and see  or reach out anyway.
+            No open roles right now — check back soon, or reach out anyway.
           </p>
         ) : (
           <Reveal className="mt-14 divide-y divide-tertiary/30 border-y border-tertiary/30">
             {openJobs.map((job) => (
-              <RevealItem key={job.slug}>
+              <RevealItem key={job.slug || job.id}>
                 <Link
                   href={`/careers/${job.slug}`}
                   className="group flex flex-col gap-2 py-6 transition-colors hover:bg-primary-container/20 sm:flex-row sm:items-center sm:justify-between sm:px-4"
@@ -90,8 +102,9 @@ export default function CareersPage({ jobs }: Props) {
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
     const jobs = await api.getJobs();
-    return { props: { jobs }, revalidate: 3600 };
+    return { props: { jobs: jobs || [] }, revalidate: 3600 };
   } catch {
     return { props: { jobs: [] }, revalidate: 60 };
   }
 };
+

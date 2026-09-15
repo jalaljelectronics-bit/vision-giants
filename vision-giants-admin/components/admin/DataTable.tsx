@@ -12,7 +12,9 @@ interface DataTableProps<T extends { id: number }> {
   rows: T[];
   isLoading?: boolean;
   emptyMessage?: string;
+  editLabel?: string;
   onEdit?: (row: T) => void;
+  onView?: (row: T) => void;
   onDelete?: (row: T) => void;
 }
 
@@ -21,7 +23,9 @@ export default function DataTable<T extends { id: number }>({
   rows,
   isLoading,
   emptyMessage = 'No records found.',
+  editLabel = 'Edit',
   onEdit,
+  onView,
   onDelete,
 }: DataTableProps<T>) {
   if (isLoading) {
@@ -32,7 +36,7 @@ export default function DataTable<T extends { id: number }>({
     return <p className="admin-table-empty">{emptyMessage}</p>;
   }
 
-  const hasActions = Boolean(onEdit || onDelete);
+  const hasActions = Boolean(onEdit || onView || onDelete);
 
   return (
     <table className="admin-data-table">
@@ -54,9 +58,14 @@ export default function DataTable<T extends { id: number }>({
             ))}
             {hasActions && (
               <td className="admin-table-actions-col">
+                {onView && (
+                  <button type="button" onClick={() => onView(row)} className="admin-table-action" style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+                    View
+                  </button>
+                )}
                 {onEdit && (
                   <button type="button" onClick={() => onEdit(row)} className="admin-table-action">
-                    Edit
+                    {editLabel}
                   </button>
                 )}
                 {onDelete && (

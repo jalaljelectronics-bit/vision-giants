@@ -12,6 +12,8 @@ interface Props {
 }
 
 export default function CareerDetailPage({ job }: Props) {
+  if (!job) return null;
+
   const url = `${siteConfig.url}/careers/${job.slug}`;
 
   return (
@@ -87,7 +89,7 @@ export default function CareerDetailPage({ job }: Props) {
           <p className="mx-auto mt-2 max-w-md text-body/70">
             Send us your background and a bit about why this role's a fit.
           </p>
-          <Button href={`/contact?role=${job.slug}`} size="lg" className="mt-6">
+          <Button href={`/careers/apply?role=${job.slug}`} size="lg" className="mt-6">
             Apply Now <ArrowRight size={16} />
           </Button>
         </div>

@@ -31,6 +31,7 @@ export interface PortfolioItem {
   is_draft: boolean;
   created_at: string;
 }
+
 export interface TeamMember {
   id: number;
   name: string;
@@ -75,12 +76,20 @@ export interface JobPosting {
 }
 
 export interface JobApplicationPayload {
-  job_id: number;
-  name: string;
+  job_id?: number | null;
+  name?: string;
+  first_name: string;
+  last_name?: string;
+  gender?: string;
+  date_of_birth?: string;
+  phone?: string;
+  address?: string;
   email: string;
-  phone: string;
-  resume_url: string;
-  cover_letter: string;
+  education?: string;
+  experience?: string;
+  remote_job?: string;
+  cover_letter?: string;
+  resume_url?: string;
 }
 
 export interface ContactLeadPayload {

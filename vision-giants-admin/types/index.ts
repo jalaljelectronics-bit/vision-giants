@@ -80,14 +80,27 @@ export interface JobPosting {
   created_at: string;
 }
 
+export type ApplicationStatus = 'new' | 'reviewed' | 'shortlisted' | 'rejected' | 'hired';
+
 export interface JobApplication {
   id: number;
-  job_id: number;
+  job_id: number | null;
+  job_title?: string;
+  job_department?: string;
   name: string;
+  first_name?: string;
+  last_name?: string;
+  gender?: string;
+  date_of_birth?: string;
   email: string;
-  phone: string;
-  resume_url: string;
-  cover_letter: string;
+  phone?: string;
+  address?: string;
+  education?: string;
+  experience?: string;
+  remote_job?: string;
+  resume_url?: string;
+  cover_letter?: string;
+  status?: ApplicationStatus;
   created_at: string;
 }
 
