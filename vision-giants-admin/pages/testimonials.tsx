@@ -84,10 +84,12 @@ export default function TestimonialsPage() {
     {
       key: 'client_name',
       header: 'Client',
+      render: (testimonial) => testimonial.client_name || '—',
     },
     {
       key: 'client_company',
       header: 'Company',
+      render: (testimonial) => testimonial.client_company || '—',
     },
     {
       key: 'content',
@@ -101,7 +103,7 @@ export default function TestimonialsPage() {
       key: 'rating',
       header: 'Rating',
       render: (testimonial) =>
-        '★'.repeat(testimonial.rating),
+        '★'.repeat(testimonial.rating || 5),
     },
   ];
 

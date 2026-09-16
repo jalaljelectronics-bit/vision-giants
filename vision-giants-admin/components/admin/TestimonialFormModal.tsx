@@ -31,11 +31,10 @@ function toFormState(
   }
 
   return {
-    client_name: testimonial.client_name,
-    client_company:
-      testimonial.client_company || '',
-    content: testimonial.content,
-    rating: testimonial.rating,
+    client_name: testimonial.client_name || '',
+    client_company: testimonial.client_company || '',
+    content: testimonial.content || '',
+    rating: testimonial.rating || 5,
     photo: testimonial.photo || '',
   };
 }
@@ -74,11 +73,11 @@ export default function TestimonialFormModal({
     setIsSaving(true);
 
     const payload = {
-      client_name: form.client_name,
-      client_company: form.client_company,
-      content: form.content,
+      client_name: form.client_name.trim() || null,
+      client_company: form.client_company.trim() || null,
+      content: form.content.trim(),
       rating: form.rating,
-      photo: form.photo,
+      photo: form.photo.trim() || null,
     };
 
     try {
@@ -128,7 +127,7 @@ export default function TestimonialFormModal({
         </h2>
 
         <label htmlFor="client_name">
-          Client Name
+          Client Name (Optional)
         </label>
 
         <input
@@ -140,11 +139,11 @@ export default function TestimonialFormModal({
               e.target.value
             )
           }
-          required
+          placeholder="e.g. John Doe (or leave blank)"
         />
 
         <label htmlFor="client_company">
-          Client Company
+          Client Company (Optional)
         </label>
 
         <input
@@ -156,10 +155,11 @@ export default function TestimonialFormModal({
               e.target.value
             )
           }
+          placeholder="e.g. Acme Corp"
         />
 
         <label htmlFor="content">
-          Testimonial
+          Testimonial <span style={{ color: '#ef4444' }}>*</span>
         </label>
 
         <textarea
@@ -173,6 +173,7 @@ export default function TestimonialFormModal({
           }
           rows={4}
           required
+          placeholder="Enter the testimonial quote or review..."
         />
 
         <label htmlFor="rating">
@@ -195,7 +196,7 @@ export default function TestimonialFormModal({
         />
 
         <label>
-          Client Photo
+          Client Photo (Optional)
         </label>
 
         <CloudinaryUpload

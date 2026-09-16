@@ -42,11 +42,11 @@ export interface TeamMember {
 
 export interface Testimonial {
   id: number;
-  client_name: string;
-  client_company: string;
+  client_name?: string | null;
+  client_company?: string | null;
   content: string;
   rating: number;
-  photo: string;
+  photo?: string | null;
 }
 
 export interface BlogPost {
