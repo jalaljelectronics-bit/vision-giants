@@ -1,5 +1,7 @@
 import { GetStaticProps } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useReducedMotion } from 'framer-motion';
 import { Seo } from '@/components/seo/Seo';
 import { Hero } from '@/components/sections/Hero';
 import { Testimonials } from '@/components/sections/Testimonials';
@@ -10,7 +12,6 @@ import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { Testimonial, PortfolioItem, Service } from '@/types';
-import { PortfolioMarquee } from '@/components/sections/PortfolioMarquee';
 import { Target, Eye, Heart, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface Props {
@@ -48,12 +49,33 @@ const VALUES = [
   },
 ];
 
+function PortfolioPill({ item }: { item: PortfolioItem }) {
+  return (
+    <Link
+      href={`/portfolio/${item.slug}`}
+      className="group flex shrink-0 items-center gap-2.5 rounded-full bg-surface px-4 py-2.5 shadow-md shadow-black/20 ring-1 ring-white/20 transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-xl hover:ring-white/40 active:scale-95"
+    >
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-[11px] font-bold text-white shadow-sm transition-transform duration-300 group-hover:scale-110">
+        {item.title.charAt(0).toUpperCase()}
+      </span>
+      <span className="whitespace-nowrap font-mono text-xs font-bold uppercase tracking-wider text-primary transition-colors">
+        {item.title}
+      </span>
+      <span className="text-primary/40 text-xs transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-primary">
+        →
+      </span>
+    </Link>
+  );
+}
+
 export default function HomePage({
   testimonials = [],
   featuredPortfolio = [],
   allPortfolio = [],
   services = [],
 }: Props) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <>
       <Seo
@@ -64,8 +86,32 @@ export default function HomePage({
 
       <Hero services={services} />
 
-      {/* Prominent Auto-scrolling Strip with Dynamic Center Scale & Opacity */}
-      <PortfolioMarquee items={allPortfolio} />
+      {/* Auto-scrolling strip of all portfolio projects — reduced-motion
+          users get a plain static, manually-scrollable row instead. */}
+      {allPortfolio.length > 0 &&
+        (reduceMotion ? (
+          <div className="border-t border-white/10 bg-primary py-5">
+            <div className="scrollbar-none flex gap-3 overflow-x-auto px-6" style={{ scrollbarWidth: 'none' }}>
+              {allPortfolio.map((item) => (
+                <PortfolioPill key={item.slug} item={item} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="group/marquee relative overflow-hidden border-t border-white/10 bg-primary py-5">
+            {/* Fade gradient masks on both sides for smooth edge transition */}
+            <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20 bg-gradient-to-r from-primary to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20 bg-gradient-to-l from-primary to-transparent" />
+
+            {/* Content is duplicated so the track can animate from 0% to
+                -50% and loop back to 0% with no visible seam. */}
+            <div className="animate-marquee flex w-max gap-4 group-hover/marquee:[animation-play-state:paused]">
+              {[...allPortfolio, ...allPortfolio].map((item, i) => (
+                <PortfolioPill key={`${item.slug}-${i}`} item={item} />
+              ))}
+            </div>
+          </div>
+        ))}
 
       {/* CEO intro block */}
       <section className="mx-auto max-w-container px-6 py-20">
