@@ -49,20 +49,19 @@ const VALUES = [
   },
 ];
 
+// Was a separate PortfolioMarquee.tsx component — folded in here since
+// it's only ever used on this one page. Not exported, just a local helper.
 function PortfolioPill({ item }: { item: PortfolioItem }) {
   return (
     <Link
       href={`/portfolio/${item.slug}`}
-      className="group flex shrink-0 items-center gap-2.5 rounded-full bg-surface px-4 py-2.5 shadow-md shadow-black/20 ring-1 ring-white/20 transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-xl hover:ring-white/40 active:scale-95"
+      className="group flex shrink-0 items-center gap-2.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-white/10"
     >
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-[11px] font-bold text-white shadow-sm transition-transform duration-300 group-hover:scale-110">
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/15 font-mono text-[11px] font-semibold text-white">
         {item.title.charAt(0).toUpperCase()}
       </span>
-      <span className="whitespace-nowrap font-mono text-xs font-bold uppercase tracking-wider text-primary transition-colors">
+      <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-white/80 group-hover:text-white">
         {item.title}
-      </span>
-      <span className="text-primary/40 text-xs transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-primary">
-        →
       </span>
     </Link>
   );
@@ -98,14 +97,10 @@ export default function HomePage({
             </div>
           </div>
         ) : (
-          <div className="group/marquee relative overflow-hidden border-t border-white/10 bg-primary py-5">
-            {/* Fade gradient masks on both sides for smooth edge transition */}
-            <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20 bg-gradient-to-r from-primary to-transparent" />
-            <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20 bg-gradient-to-l from-primary to-transparent" />
-
+          <div className="group/marquee overflow-hidden border-t border-white/10 bg-primary py-5">
             {/* Content is duplicated so the track can animate from 0% to
                 -50% and loop back to 0% with no visible seam. */}
-            <div className="animate-marquee flex w-max gap-4 group-hover/marquee:[animation-play-state:paused]">
+            <div className="animate-marquee flex w-max gap-3 group-hover/marquee:[animation-play-state:paused]">
               {[...allPortfolio, ...allPortfolio].map((item, i) => (
                 <PortfolioPill key={`${item.slug}-${i}`} item={item} />
               ))}

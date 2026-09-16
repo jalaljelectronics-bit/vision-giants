@@ -68,12 +68,12 @@ export default function PortfolioPage({ items = [], testimonials = [] }: Props) 
                     });
                   });
                 }}
-                className="group relative flex shrink-0 items-center gap-2.5 rounded-full border border-tertiary/40 bg-surface px-4 py-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-primary hover:shadow-md active:scale-95"
+                className="group relative flex shrink-0 items-center gap-2.5 rounded-full border border-tertiary/40 bg-surface px-4 py-2 transition-colors hover:border-primary"
               >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-[11px] font-bold text-white shadow-sm transition-transform duration-300 group-hover:scale-110">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container font-mono text-[11px] font-semibold text-primary">
                   {item.title.charAt(0).toUpperCase()}
                 </span>
-                <span className="whitespace-nowrap font-mono text-xs font-bold uppercase tracking-wider text-primary">
+                <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-body/70 group-hover:text-primary">
                   {item.title}
                 </span>
                 {getHostname(item.project_url) && (
