@@ -1,7 +1,5 @@
 import { GetStaticProps } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useReducedMotion } from 'framer-motion';
 import { Seo } from '@/components/seo/Seo';
 import { Hero } from '@/components/sections/Hero';
 import { Testimonials } from '@/components/sections/Testimonials';
@@ -12,6 +10,7 @@ import { Reveal, RevealItem } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { Testimonial, PortfolioItem, Service } from '@/types';
+import { PortfolioMarquee } from '@/components/sections/PortfolioMarquee';
 import { Target, Eye, Heart, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface Props {
@@ -49,32 +48,12 @@ const VALUES = [
   },
 ];
 
-// Was a separate PortfolioMarquee.tsx component — folded in here since
-// it's only ever used on this one page. Not exported, just a local helper.
-function PortfolioPill({ item }: { item: PortfolioItem }) {
-  return (
-    <Link
-      href={`/portfolio/${item.slug}`}
-      className="group flex shrink-0 items-center gap-2.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-white/10"
-    >
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/15 font-mono text-[11px] font-semibold text-white">
-        {item.title.charAt(0).toUpperCase()}
-      </span>
-      <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-white/80 group-hover:text-white">
-        {item.title}
-      </span>
-    </Link>
-  );
-}
-
 export default function HomePage({
   testimonials = [],
   featuredPortfolio = [],
   allPortfolio = [],
   services = [],
 }: Props) {
-  const reduceMotion = useReducedMotion();
-
   return (
     <>
       <Seo
@@ -85,28 +64,8 @@ export default function HomePage({
 
       <Hero services={services} />
 
-      {/* Auto-scrolling strip of all portfolio projects — reduced-motion
-          users get a plain static, manually-scrollable row instead. */}
-      {allPortfolio.length > 0 &&
-        (reduceMotion ? (
-          <div className="border-t border-white/10 bg-primary py-5">
-            <div className="scrollbar-none flex gap-3 overflow-x-auto px-6" style={{ scrollbarWidth: 'none' }}>
-              {allPortfolio.map((item) => (
-                <PortfolioPill key={item.slug} item={item} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="group/marquee overflow-hidden border-t border-white/10 bg-primary py-5">
-            {/* Content is duplicated so the track can animate from 0% to
-                -50% and loop back to 0% with no visible seam. */}
-            <div className="animate-marquee flex w-max gap-3 group-hover/marquee:[animation-play-state:paused]">
-              {[...allPortfolio, ...allPortfolio].map((item, i) => (
-                <PortfolioPill key={`${item.slug}-${i}`} item={item} />
-              ))}
-            </div>
-          </div>
-        ))}
+      {/* Prominent Auto-scrolling Strip with Dynamic Center Scale & Opacity */}
+      <PortfolioMarquee items={allPortfolio} />
 
       {/* CEO intro block */}
       <section className="mx-auto max-w-container px-6 py-20">
