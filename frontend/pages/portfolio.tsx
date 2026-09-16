@@ -17,13 +17,14 @@ interface Props {
   testimonials: Testimonial[];
 }
 
-export default function PortfolioPage({ items, testimonials }: Props) {
+export default function PortfolioPage({ items = [], testimonials = [] }: Props) {
+  const safeItems = items || [];
   const allTech = useMemo(
-    () => Array.from(new Set(items.flatMap((i) => i.technologies))).sort(),
-    [items]
+    () => Array.from(new Set(safeItems.flatMap((i) => i.technologies || []))).sort(),
+    [safeItems]
   );
   const [filter, setFilter] = useState<string>('All');
-  const filtered = filter === 'All' ? items : items.filter((i) => i.technologies.includes(filter));
+  const filtered = filter === 'All' ? safeItems : safeItems.filter((i) => (i.technologies || []).includes(filter));
 
   return (
     <>

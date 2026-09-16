@@ -33,10 +33,10 @@ const VALUES = [
   },
 ];
 
-export default function AboutPage({ team }: Props) {
+export default function AboutPage({ team = [] }: Props) {
   // Pulls the real name/role from whoever's marked CEO/Founder on the team
   // API, if anyone is; otherwise falls back to a placeholder you can edit.
-  const ceoFromApi = team.find((m) => /ceo|founder/i.test(m.role));
+  const ceoFromApi = (team || []).find((m) => /ceo|founder/i.test(m.role));
   const ceo = ceoFromApi ?? { name: 'Jalal Khan', role: 'CEO', photo: CEO_PHOTO, id: 0, order: 0 };
 
   return (

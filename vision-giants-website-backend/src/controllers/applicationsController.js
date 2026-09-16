@@ -1,21 +1,10 @@
 const applications = require('../queries/applications');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
-const { getSignedResumeUrl } = require('../utils/cloudinary');
-
-function formatApplication(app) {
-  if (!app) return null;
-  return {
-    ...app,
-    raw_resume_url: app.resume_url,
-    resume_url: getSignedResumeUrl(app.resume_url),
-  };
-}
 
 exports.list = asyncHandler(async (req, res) => {
   const result = await applications.getAll();
-  const formatted = (result.rows || []).map(formatApplication);
-  return ApiResponse.success(res, formatted);
+  return ApiResponse.success(res, result.rows);
 });
 
 exports.getById = asyncHandler(async (req, res) => {
@@ -23,22 +12,12 @@ exports.getById = asyncHandler(async (req, res) => {
   if (!result.rows[0]) {
     return ApiResponse.notFound(res, 'Application not found');
   }
-  return ApiResponse.success(res, formatApplication(result.rows[0]));
-});
-
-exports.downloadResume = asyncHandler(async (req, res) => {
-  const result = await applications.getById(req.params.id);
-  const app = result.rows[0];
-  if (!app || !app.resume_url) {
-    return ApiResponse.notFound(res, 'Resume not found for this application');
-  }
-  const signedUrl = getSignedResumeUrl(app.resume_url);
-  return res.redirect(signedUrl);
+  return ApiResponse.success(res, result.rows[0]);
 });
 
 exports.create = asyncHandler(async (req, res) => {
   const result = await applications.create(req.body);
-  return ApiResponse.success(res, formatApplication(result.rows[0]), 201);
+  return ApiResponse.success(res, result.rows[0], 201);
 });
 
 exports.updateStatus = asyncHandler(async (req, res) => {
@@ -47,7 +26,7 @@ exports.updateStatus = asyncHandler(async (req, res) => {
   if (!result.rows[0]) {
     return ApiResponse.notFound(res, 'Application not found');
   }
-  return ApiResponse.success(res, formatApplication(result.rows[0]));
+  return ApiResponse.success(res, result.rows[0]);
 });
 
 exports.remove = asyncHandler(async (req, res) => {

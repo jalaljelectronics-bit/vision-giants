@@ -14,7 +14,7 @@ interface Props {
   services: Service[];
 }
 
-export default function ServicesPage({ services }: Props) {
+export default function ServicesPage({ services = [] }: Props) {
   return (
     <>
       <Seo

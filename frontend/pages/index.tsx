@@ -67,7 +67,12 @@ function PortfolioPill({ item }: { item: PortfolioItem }) {
   );
 }
 
-export default function HomePage({ testimonials, featuredPortfolio, allPortfolio, services }: Props) {
+export default function HomePage({
+  testimonials = [],
+  featuredPortfolio = [],
+  allPortfolio = [],
+  services = [],
+}: Props) {
   const reduceMotion = useReducedMotion();
 
   return (

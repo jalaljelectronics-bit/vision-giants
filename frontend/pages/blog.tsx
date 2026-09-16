@@ -12,7 +12,7 @@ interface Props {
   posts: BlogPost[];
 }
 
-export default function BlogPage({ posts }: Props) {
+export default function BlogPage({ posts = [] }: Props) {
   return (
     <>
       <Seo
