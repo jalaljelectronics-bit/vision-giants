@@ -19,7 +19,7 @@ export function Seo({
   noindex = false,
 }: SeoProps) {
   const url = `${siteConfig.url}${path}`;
-  const fullTitle = path === '' ? `${siteConfig.name} — Software Development Studio` : `${title} | ${siteConfig.name}`;
+  const fullTitle = path === '' || path === '/' ? `${siteConfig.name} | Software Studio` : `${title} | ${siteConfig.name}`;
   const ogImage = image.startsWith('http') ? image : `${siteConfig.url}${image}`;
 
   return (

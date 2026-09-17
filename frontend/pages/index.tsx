@@ -37,7 +37,7 @@ export default function HomePage({
   return (
     <>
       <Seo
-        title="Software Development Studio"
+        title="Software Studio"
         description={siteConfig.description}
         path="/"
       />
