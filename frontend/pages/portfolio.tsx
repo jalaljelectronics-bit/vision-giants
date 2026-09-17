@@ -1,5 +1,6 @@
 import { GetStaticProps } from 'next';
 import { useMemo, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { Seo } from '@/components/seo/Seo';
 import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { HeroBand } from '@/components/layout/HeroBand';
@@ -19,12 +20,23 @@ interface Props {
 
 export default function PortfolioPage({ items = [], testimonials = [] }: Props) {
   const safeItems = items || [];
+  const reduceMotion = useReducedMotion();
   const allTech = useMemo(
     () => Array.from(new Set(safeItems.flatMap((i) => i.technologies || []))).sort(),
     [safeItems]
   );
   const [filter, setFilter] = useState<string>('All');
   const filtered = filter === 'All' ? safeItems : safeItems.filter((i) => (i.technologies || []).includes(filter));
+
+  const handlePillClick = (slug: string) => {
+    setFilter('All');
+    requestAnimationFrame(() => {
+      document.getElementById(`portfolio-${slug}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  };
 
   return (
     <>
@@ -47,45 +59,59 @@ export default function PortfolioPage({ items = [], testimonials = [] }: Props) 
         variant="portfolio"
       />
 
-      {/* Client pill strip — jumps to that project's card below. Inlined
-          here rather than a separate component since it's only used on
-          this one page. Not the same as PortfolioMarquee (home page):
-          this one doesn't auto-scroll or duplicate items, since clicking
-          a pill to jump somewhere doesn't mix well with content also
-          sliding around on its own. */}
-      {items.length > 0 && (
-        <div className="border-y border-tertiary/30 bg-primary-container/10 py-5">
-          <div className="scrollbar-none flex gap-3 overflow-x-auto px-6" style={{ scrollbarWidth: 'none' }}>
-            {items.map((item) => (
-              <button
-                key={item.slug}
-                onClick={() => {
-                  setFilter('All');
-                  requestAnimationFrame(() => {
-                    document.getElementById(`portfolio-${item.slug}`)?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  });
-                }}
-                className="group relative flex shrink-0 items-center gap-2.5 rounded-full border border-tertiary/40 bg-surface px-4 py-2 transition-colors hover:border-primary"
-              >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container font-mono text-[11px] font-semibold text-primary">
-                  {item.title.charAt(0).toUpperCase()}
-                </span>
-                <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-body/70 group-hover:text-primary">
-                  {item.title}
-                </span>
-                {getHostname(item.project_url) && (
-                  <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-tertiary/40 bg-surface px-3 py-1.5 text-xs text-primary opacity-0 shadow-lg shadow-primary/10 transition-opacity group-hover:opacity-100">
-                    {getHostname(item.project_url)}
+      {/* Infinite auto-scrolling client pill marquee with mask gradient fade */}
+      {safeItems.length > 0 &&
+        (reduceMotion ? (
+          <div className="border-y border-tertiary/30 bg-primary-container/10 py-5">
+            <div className="scrollbar-none flex gap-3 overflow-x-auto px-6" style={{ scrollbarWidth: 'none' }}>
+              {safeItems.map((item) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  onClick={() => handlePillClick(item.slug)}
+                  className="group relative flex shrink-0 items-center gap-2.5 rounded-full border border-tertiary/40 bg-surface px-4 py-2 transition-colors hover:border-primary"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container font-mono text-[11px] font-semibold text-primary">
+                    {item.title.charAt(0).toUpperCase()}
                   </span>
-                )}
-              </button>
-            ))}
+                  <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-body/70 group-hover:text-primary">
+                    {item.title}
+                  </span>
+                  {getHostname(item.project_url) && (
+                    <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-tertiary/40 bg-surface px-3 py-1.5 text-xs text-primary opacity-0 shadow-lg shadow-primary/10 transition-opacity group-hover:opacity-100">
+                      {getHostname(item.project_url)}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="group/marquee overflow-hidden border-y border-tertiary/30 bg-primary-container/10 py-5 [mask-image:linear-gradient(to_right,transparent_0%,black_5%,black_95%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_5%,black_95%,transparent_100%)]">
+            <div className="animate-marquee flex w-max gap-3 group-hover/marquee:[animation-play-state:paused]">
+              {[...safeItems, ...safeItems].map((item, i) => (
+                <button
+                  key={`${item.slug}-${i}`}
+                  type="button"
+                  onClick={() => handlePillClick(item.slug)}
+                  className="group relative flex shrink-0 items-center gap-2.5 rounded-full border border-tertiary/40 bg-surface px-4 py-2 transition-colors hover:border-primary"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container font-mono text-[11px] font-semibold text-primary">
+                    {item.title.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-body/70 group-hover:text-primary">
+                    {item.title}
+                  </span>
+                  {getHostname(item.project_url) && (
+                    <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-tertiary/40 bg-surface px-3 py-1.5 text-xs text-primary opacity-0 shadow-lg shadow-primary/10 transition-opacity group-hover:opacity-100">
+                      {getHostname(item.project_url)}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
 
       <section className="mx-auto max-w-container px-6 py-20">
         <Reveal className="max-w-xl">
