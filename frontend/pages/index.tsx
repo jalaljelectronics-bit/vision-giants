@@ -7,12 +7,11 @@ import { PortfolioMarquee } from '@/components/sections/PortfolioMarquee';
 import { RecentProjectsCarousel } from '@/components/sections/RecentProjectsCarousel';
 import { Testimonials } from '@/components/sections/Testimonials';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Reveal, RevealItem } from '@/components/motion/Reveal';
+import { Reveal } from '@/components/motion/Reveal';
 import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/utils';
 import type { Testimonial, PortfolioItem, Service } from '@/types';
-import { Target, Eye, Heart, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   testimonials: Testimonial[];
@@ -28,24 +27,6 @@ const INTRO_CHECKLIST = [
   'Strategic partnerships for enhanced capabilities',
   'Commitment to quality and reliability',
   'Proven track record of success',
-];
-
-const VALUES = [
-  {
-    icon: Target,
-    title: 'Ship what matters',
-    body: 'We scope ruthlessly around the features that move the metric you actually care about.',
-  },
-  {
-    icon: Eye,
-    title: 'No black boxes',
-    body: "Clear documentation and clean code, so your next hire isn't stuck reverse-engineering our decisions.",
-  },
-  {
-    icon: Heart,
-    title: 'Own the outcome',
-    body: 'We treat every client project like it has to survive contact with real users — because it does.',
-  },
 ];
 
 export default function HomePage({
@@ -154,33 +135,7 @@ export default function HomePage({
         </section>
       )}
 
-      {/* Why teams choose us */}
-      <section className="border-y border-tertiary/30 bg-primary-container/20">
-        <div className="mx-auto max-w-container px-6 py-20">
-          <Reveal className="max-w-xl">
-            <p className="font-mono text-xs uppercase tracking-widest text-body/50">
-              Why Teams Choose Us
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-primary md:text-4xl">
-              A studio that thinks like a co-founder, not a vendor
-            </h2>
-          </Reveal>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {VALUES.map((v) => (
-              <RevealItem key={v.title}>
-                <Card className="h-full">
-                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-container text-primary">
-                    <v.icon size={20} />
-                  </div>
-                  <h3 className="mt-4 font-display text-lg font-semibold text-primary">{v.title}</h3>
-                  <p className="mt-3 text-sm text-body/70">{v.body}</p>
-                </Card>
-              </RevealItem>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="mx-auto max-w-container px-6 py-20">
         <Reveal className="text-center">
