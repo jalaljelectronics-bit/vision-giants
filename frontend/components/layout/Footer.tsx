@@ -1,13 +1,16 @@
 import Link from 'next/link';
 import { siteConfig } from '@/lib/utils';
 
-const SERVICES = [
+const DEVELOPMENT_SERVICES = [
   { label: 'Web Development', href: '/services/web-development' },
-  { label: 'Game Development', href: '/services/game-development' },
-  { label: 'Custom Software Development', href: '/services/custom-software-development' },
-  { label: 'SEO', href: '/services/seo' },
   { label: 'App Development', href: '/services/app-development' },
+  { label: 'Custom Software', href: '/services/custom-software-development' },
+  { label: 'Game Development', href: '/services/game-development' },
   { label: 'Robotics', href: '/services/robotics' },
+];
+
+const GROWTH_DESIGN_SERVICES = [
+  { label: 'SEO', href: '/services/seo' },
   { label: 'Social Media Marketing', href: '/services/social-media-marketing' },
   { label: 'Graphic Designing', href: '/services/graphic-designing' },
   { label: 'E-commerce', href: '/services/e-commerce' },
@@ -29,7 +32,7 @@ export default function Footer() {
   return (
     <footer className="mt-24 bg-primary text-white">
       <div className="mx-auto max-w-container px-6 py-16">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-6">
           {/* Brand Info */}
           <div className="sm:col-span-2 lg:col-span-2">
             <p className="font-display text-lg font-semibold text-white">Vision Giants PTV LTD</p>
@@ -38,18 +41,45 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Services Column (single vertical column with all 10 services) */}
-          <div className="col-span-1">
-            <p className="font-mono text-xs uppercase tracking-widest text-white/40">Services</p>
-            <ul className="mt-4 space-y-2.5">
-              {SERVICES.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-white/75 transition-colors hover:text-white">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Services Section with 2 Grouped Sub-columns */}
+          <div className="sm:col-span-2 lg:col-span-2">
+            <div className="w-fit">
+              <p className="text-center font-mono text-xs uppercase tracking-widest text-white/40">Services</p>
+
+              <div className="mt-4 grid grid-cols-2 gap-6 sm:gap-8">
+                {/* Development Sub-column */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-white">
+                    Development
+                  </p>
+                  <ul className="mt-3 space-y-2.5">
+                    {DEVELOPMENT_SERVICES.map((link) => (
+                      <li key={link.href}>
+                        <Link href={link.href} className="text-sm text-white/75 transition-colors hover:text-white">
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Growth & Design Sub-column */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-white">
+                    Growth &amp; Design
+                  </p>
+                  <ul className="mt-3 space-y-2.5">
+                    {GROWTH_DESIGN_SERVICES.map((link) => (
+                      <li key={link.href}>
+                        <Link href={link.href} className="text-sm text-white/75 transition-colors hover:text-white">
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Company Column */}
