@@ -1,11 +1,11 @@
 import { GetStaticProps } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useReducedMotion } from 'framer-motion';
 import { Seo } from '@/components/seo/Seo';
 import { Hero } from '@/components/sections/Hero';
+import { PortfolioMarquee } from '@/components/sections/PortfolioMarquee';
+import { RecentProjectsCarousel } from '@/components/sections/RecentProjectsCarousel';
 import { Testimonials } from '@/components/sections/Testimonials';
-import { PortfolioCard } from '@/components/sections/PortfolioCard';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Reveal, RevealItem } from '@/components/motion/Reveal';
@@ -16,7 +16,6 @@ import { Target, Eye, Heart, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   testimonials: Testimonial[];
-  featuredPortfolio: PortfolioItem[];
   allPortfolio: PortfolioItem[];
   services: Service[];
 }
@@ -49,32 +48,11 @@ const VALUES = [
   },
 ];
 
-// Was a separate PortfolioMarquee.tsx component — folded in here since
-// it's only ever used on this one page. Not exported, just a local helper.
-function PortfolioPill({ item }: { item: PortfolioItem }) {
-  return (
-    <Link
-      href={`/portfolio/${item.slug}`}
-      className="group flex shrink-0 items-center gap-2.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-white/10"
-    >
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/15 font-mono text-[11px] font-semibold text-white">
-        {item.title.charAt(0).toUpperCase()}
-      </span>
-      <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide text-white/80 group-hover:text-white">
-        {item.title}
-      </span>
-    </Link>
-  );
-}
-
 export default function HomePage({
   testimonials = [],
-  featuredPortfolio = [],
   allPortfolio = [],
   services = [],
 }: Props) {
-  const reduceMotion = useReducedMotion();
-
   return (
     <>
       <Seo
@@ -85,28 +63,7 @@ export default function HomePage({
 
       <Hero services={services} />
 
-      {/* Auto-scrolling strip of all portfolio projects — reduced-motion
-          users get a plain static, manually-scrollable row instead. */}
-      {allPortfolio.length > 0 &&
-        (reduceMotion ? (
-          <div className="border-t border-white/10 bg-primary py-5">
-            <div className="scrollbar-none flex gap-3 overflow-x-auto px-6" style={{ scrollbarWidth: 'none' }}>
-              {allPortfolio.map((item) => (
-                <PortfolioPill key={item.slug} item={item} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="group/marquee overflow-hidden border-t border-white/10 bg-primary py-5">
-            {/* Content is duplicated so the track can animate from 0% to
-                -50% and loop back to 0% with no visible seam. */}
-            <div className="animate-marquee flex w-max gap-3 group-hover/marquee:[animation-play-state:paused]">
-              {[...allPortfolio, ...allPortfolio].map((item, i) => (
-                <PortfolioPill key={`${item.slug}-${i}`} item={item} />
-              ))}
-            </div>
-          </div>
-        ))}
+      <PortfolioMarquee items={allPortfolio} />
 
       {/* CEO intro block */}
       <section className="mx-auto max-w-container px-6 py-20">
@@ -175,8 +132,8 @@ export default function HomePage({
         </Reveal>
       </section>
 
-      {/* Recent launch / featured portfolio */}
-      {featuredPortfolio.length > 0 && (
+      {/* Recent launch / all portfolio projects in auto-rotating carousel */}
+      {allPortfolio.length > 0 && (
         <section className="mt-16 border-y border-tertiary/30 bg-primary-container/20 pt-16 md:mt-20">
           <div className="mx-auto max-w-container px-6 pb-20">
             <Reveal className="flex items-end justify-between gap-6">
@@ -192,11 +149,7 @@ export default function HomePage({
                 All Work <ArrowRight size={14} />
               </Button>
             </Reveal>
-            <div className="mt-10 grid gap-8 md:grid-cols-2">
-              {featuredPortfolio.map((item) => (
-                <PortfolioCard key={item.slug} item={item} />
-              ))}
-            </div>
+            <RecentProjectsCarousel items={allPortfolio} />
           </div>
         </section>
       )}
@@ -267,15 +220,14 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       api.getPortfolio(),
       api.getServices(),
     ]);
-    const featuredPortfolio = portfolio.filter((p) => p.featured).slice(0, 2);
     const allPortfolio = portfolio.filter((p) => !p.is_draft);
     return {
-      props: { testimonials, featuredPortfolio, allPortfolio, services },
+      props: { testimonials, allPortfolio, services },
       revalidate: 3600,
     };
   } catch {
     return {
-      props: { testimonials: [], featuredPortfolio: [], allPortfolio: [], services: [] },
+      props: { testimonials: [], allPortfolio: [], services: [] },
       revalidate: 60,
     };
   }
