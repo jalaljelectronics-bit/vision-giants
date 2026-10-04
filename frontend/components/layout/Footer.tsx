@@ -35,7 +35,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-6">
           {/* Brand Info */}
           <div className="sm:col-span-2 lg:col-span-2">
-            <p className="font-display text-lg font-semibold text-white">Vision Giants PTV LTD</p>
+            <p className="font-display text-lg font-semibold text-white">Vision Giants Pvt Ltd</p>
             <p className="mt-3 max-w-xs text-sm text-white/60">
               Engineering ambitious ideas into scalable software — from first sketch to global launch.
             </p>
@@ -113,7 +113,7 @@ export default function Footer() {
 
         {/* Bottom copyright and social links */}
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/40 md:flex-row md:items-center">
-          <p>© {new Date().getFullYear()} Vision Giants PTV LTD. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Vision Giants Pvt Ltd. All rights reserved.</p>
           <div className="flex gap-5">
             <a
               href={siteConfig.links.linkedin}
