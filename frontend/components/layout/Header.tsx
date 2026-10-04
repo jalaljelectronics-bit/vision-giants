@@ -112,7 +112,7 @@ export default function Header() {
         <div className="mx-auto flex max-w-container items-center justify-between rounded-full border border-tertiary/40 bg-surface/90 px-5 py-2.5 shadow-lg shadow-primary/5 backdrop-blur-md">
           <Link href="/" className="flex items-center" aria-label={siteConfig.name}>
             <Image
-              src="https://res.cloudinary.com/r2fk1fws/image/upload/v1788118466/vision_giants_logo_with_name__2_-removebg-preview_fqgsol.png"
+              src="https://res.cloudinary.com/be8tdpje/image/upload/v1791127646/vision-giants-pvt-ltd.png"
               alt={siteConfig.name}
               width={140}
               height={32}
