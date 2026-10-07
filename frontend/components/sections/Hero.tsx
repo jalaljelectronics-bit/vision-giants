@@ -167,13 +167,15 @@ export function Hero({ services }: HeroProps) {
                     href={`/services/${active.slug}`}
                     className="sheen group block overflow-hidden rounded-3xl border border-white/10 bg-surface shadow-2xl shadow-primary/30"
                   >
-                    <div className="relative aspect-[16/9] overflow-hidden bg-primary-container">
+                    <div className="relative aspect-[16/9] overflow-hidden bg-primary-container/40">
+                      {/* object-contain shows the whole image (no cropping);
+                          the wrapper background fills any leftover space. */}
                       <Image
                         src={active.image}
                         alt={active.title}
                         fill
                         priority
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        className="object-contain"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                       />
                     </div>
