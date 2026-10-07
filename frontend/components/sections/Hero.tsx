@@ -167,24 +167,15 @@ export function Hero({ services }: HeroProps) {
                     href={`/services/${active.slug}`}
                     className="sheen group block overflow-hidden rounded-3xl border border-white/10 bg-surface shadow-2xl shadow-primary/30"
                   >
-                    <div className="relative aspect-[16/9] overflow-hidden bg-primary-container/40">
-                      {/* object-contain shows the whole image (no cropping);
-                          the wrapper background fills any leftover space. */}
-                      {/* Blurred copy fills the frame so there are no plain bars. */}
-                      <Image
-                        src={active.image}
-                        alt=""
-                        aria-hidden
-                        fill
-                        className="scale-125 object-cover opacity-60 blur-2xl"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
+                    {/* Frame matches the images' 4:3 ratio, so object-cover
+                        fills it exactly with nothing cropped. */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-primary-container">
                       <Image
                         src={active.image}
                         alt={active.title}
                         fill
                         priority
-                        className="relative object-contain"
+                        className="object-cover"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                       />
                     </div>
@@ -222,7 +213,7 @@ export function Hero({ services }: HeroProps) {
                   identical structure reserves the real, constant space. */}
               <div aria-hidden className="invisible">
                 <div className="overflow-hidden rounded-3xl border border-transparent">
-                  <div className="aspect-[16/9]" />
+                  <div className="aspect-[4/3]" />
                   <div className="h-[230px] p-8 md:p-10" />
                 </div>
               </div>
