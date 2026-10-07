@@ -170,12 +170,21 @@ export function Hero({ services }: HeroProps) {
                     <div className="relative aspect-[16/9] overflow-hidden bg-primary-container/40">
                       {/* object-contain shows the whole image (no cropping);
                           the wrapper background fills any leftover space. */}
+                      {/* Blurred copy fills the frame so there are no plain bars. */}
+                      <Image
+                        src={active.image}
+                        alt=""
+                        aria-hidden
+                        fill
+                        className="scale-125 object-cover opacity-60 blur-2xl"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
                       <Image
                         src={active.image}
                         alt={active.title}
                         fill
                         priority
-                        className="object-contain"
+                        className="relative object-contain"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                       />
                     </div>
