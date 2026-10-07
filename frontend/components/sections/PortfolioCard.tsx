@@ -19,12 +19,14 @@ export function PortfolioCard({ item, id, disableReveal = false }: PortfolioCard
       // scroll-mt clears the fixed header when jumped to via anchor link
       className="group block h-full scroll-mt-28 overflow-hidden rounded-2xl border border-tertiary/40 bg-surface transition-shadow duration-300 hover:shadow-xl hover:shadow-primary/10 md:scroll-mt-32"
     >
-      <div className="relative aspect-[16/10] overflow-hidden bg-primary-container">
+      <div className="relative aspect-[16/10] overflow-hidden bg-primary-container/40">
+        {/* object-contain shows the whole image (no cropping); the wrapper's
+            background fills any leftover space for images that aren't 16:10. */}
         <Image
           src={item.cover_image}
           alt={`${item.title} — project by ${siteConfig.name}`}
           fill
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          className="object-contain"
           sizes="(max-width: 768px) 100vw, 50vw"
         />
         <div className="absolute left-4 top-4 flex gap-2">
